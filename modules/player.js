@@ -24,7 +24,37 @@ export class Player {
         this.sprite = new Sprite("./entities/player_basic.png", this.position, spriteSize);
         this.current_animation_timing = 0;
         this.inEnvironment = undefined;
-        this.notes = [];
+        this.possessions = {
+            notes: [],
+            keys: [],
+            hasKey: function(key) {
+                for (var i = 0; i < this.keys.length; i++) {
+                    if (this.keys[i].name == key) {
+                        return true;
+                    }
+                }
+                return false;
+            },
+            items: [],
+            hasItem: function(item) {
+                for (var i = 0; i < this.items.length; i++) {
+                    if (this.items[i].name == item) {
+                        return true;
+                    }
+                }
+                return false;
+            },
+            dropItem: function(item) {
+                const temp = [];
+                for (var i = 0; i < this.items.length; i++) {
+                    if (this.items[i].name != item) {
+                        temp.push(this.items[i]);
+                    }
+                }
+                this.items = temp;
+            },
+            journal: []
+        };
     }
     rotate(targetX, targetY) {
         this.sprite.rotateSprite(this.position.x, this.position.y, targetX, targetY);

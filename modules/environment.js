@@ -1,5 +1,35 @@
 import { Sprite } from "./sprite.js";
 
+export const scenes = [
+    {
+        frames: [
+            {
+                frame: "./misc/scene/bathroom_fail_1.png",
+                time: 60
+            },
+            {
+                frame: "./misc/scene/bathroom_fail_2.png",
+                time: 60
+            },
+            {
+                frame: "./misc/scene/bathroom_fail_3.png",
+                time: 60
+            },
+            {
+                frame: "./misc/scene/bathroom_fail_4.png",
+                time: 60
+            },
+            {
+                frame: "./misc/scene/bathroom_fail_5.png",
+                time: 60
+            },
+            {
+                frame: "./misc/scene/bathroom_fail_6.png",
+                time: 60
+            }
+        ]
+    }
+];
 export var environments = [];
 export function initEnvironments() {
     environments.push(
@@ -40,7 +70,19 @@ export function initEnvironments() {
                         at: {x: 125, y: 70},
                         box: {h: 10, w: 34},
                         action: function(target, environment) {
-                            target.displayText("Nothing useful inside...", 90, {x: 160, y: 50});
+                            if(!target.possessions.hasItem("hook")){
+                                target.possessions.items.push({
+                                    name: "hook",
+                                    fullName: "Rusty fishing hook",
+                                    quantity: 1,
+                                    img: undefined
+                                });
+                                target.displayText("Found a fishing hook!", 90, {x: 160, y: 50});
+                                target.possessions.journal.push("As I rummaged through the wardrobe, my hand brushed against something cold and rusty, and I recoiled in horror as I pulled out a strange, bloodstained hook.");
+                                this.action = function(target, environment) {
+                                    target.displayText("Nothing useful anymore...", 90, {x: 160, y: 50});
+                                }
+                            }
                         }
                     },
                     {
@@ -65,7 +107,21 @@ export function initEnvironments() {
                         at: {x: 150, y: 100},
                         box: {h: 20, w: 10},
                         action: function(target, environment) {
-                            target.displayText("The door is locked...", 90, {x: 212, y: 90});
+                            if(target.possessions.hasKey("bedroom_key")) {
+                                target.displayText("Unlocked", 90, {x: 212, y: 90});
+                                target.possessions.journal.push("With a sense of relief flooding through me, I inserted the key into the lock and slowly turned it, feeling a rush of excitement and fear as I finally opened the door to the room I had been trapped in for what felt like an eternity.");
+                                this.action = function(target, environment) {
+                                    environment.unload();
+                                    environments[1].env.loadAt(target, environments[1].env.playerPosition);
+                                    target.possessions.journal.push("With a trembling hand, I pushed open the door and took a deep breath, steeling myself for whatever lay beyond as I stepped into the unknown.");
+                                    this.action = function(target, environment) {
+                                        environment.unload();
+                                        environments[1].env.loadAt(target, environments[1].env.playerPosition);
+                                    };
+                                };
+                            } else  {
+                                target.displayText("The door is locked...", 90, {x: 212, y: 90});
+                            }
                         }
                     },
                     {
@@ -82,19 +138,25 @@ export function initEnvironments() {
                                     break;
                                 }
                             }
-                            //display note and pause the game
-                            //add note to player inv
-                            target.notes.push({
-                                name: "Bedroom note",
+                            target.possessions.notes.push({
+                                name: "bedroom_note",
+                                fullName: "Note from bedroom",
+                                icon: undefined,
                                 text: undefined,
                                 img: "./misc/notes/bedroom_note.png"
                             });
-                            ui.displayNote(target.notes[target.notes.length - 1]);
+                            target.possessions.journal.push("My heart raced as I unfolded the note and read the obscure instructions, feeling a cold sweat break out on my skin as I realized I was being drawn into a sinister game of cat and mouse.");
+                            ui.displayNote(target.possessions.notes[target.possessions.notes.length - 1]);
+                            this.action = function() {};
                             return true; //true = pauses the game
                         }
                     }
                 ],
-                []
+                [],
+                {
+                    name: "./audio/rain_inside.mp3",
+                    volume: 0.3
+                }
             )
         }
     );
@@ -156,42 +218,14 @@ export function initEnvironments() {
                         box: {h: 10, w: 10},
                         action: function(target, environment, ui, game) {
                             game.paused = true;
-                            ui.playerChoice("Stick your hand in the bathtub?", [
+                            const choices = [
                                 {
                                     text: "Yes",
                                     action: function(args) {
-                                        if (false) { //player has item
-                                            //
-                                        } else {
-                                            args[3].displayScene({
-                                                frames: [
-                                                    {
-                                                        frame: "./misc/scene/bathroom_fail_1.png",
-                                                        time: 60
-                                                    },
-                                                    {
-                                                        frame: "./misc/scene/bathroom_fail_2.png",
-                                                        time: 60
-                                                    },
-                                                    {
-                                                        frame: "./misc/scene/bathroom_fail_3.png",
-                                                        time: 60
-                                                    },
-                                                    {
-                                                        frame: "./misc/scene/bathroom_fail_4.png",
-                                                        time: 60
-                                                    },
-                                                    {
-                                                        frame: "./misc/scene/bathroom_fail_5.png",
-                                                        time: 60
-                                                    },
-                                                    {
-                                                        frame: "./misc/scene/bathroom_fail_6.png",
-                                                        time: 60
-                                                    }
-                                                ]
-                                            }, args[2]);
-                                        }
+                                        args[0].position = {x: -1000, y: -1000};
+                                        args[0].sprite.updateSpritePosition(args[0].position);
+                                        args[3].displayScene(scenes[0], args[2]);
+                                        args[3].displayGameoverText("Bad desicion.", 6);
                                     }
                                 },
                                 {
@@ -200,7 +234,59 @@ export function initEnvironments() {
                                         args[2].paused = false;
                                     }
                                 }
-                            ], [target, environment, game, ui]);
+                            ];
+                            if(target.possessions.items.length > 0) {
+                                const items = [];
+                                for (var i = 0; i < target.possessions.items.length; i++) {
+                                    if (target.possessions.items[i].name == "hook") {
+                                        items.push(
+                                            {
+                                                text: target.possessions.items[i].fullName,
+                                                action: function(args) {
+                                                    args[0].possessions.keys.push(
+                                                        {
+                                                            name: "bedroom_key",
+                                                            fullName: "Bloody key",
+                                                            text: "Unlocks the master bedroom door",
+                                                            quantity: 1,
+                                                            img: undefined
+                                                        }
+                                                    );
+                                                    args[3].displayScene(scenes[0], args[2]);
+                                                    args[0].possessions.journal.push("The metallic scent of blood filled my nostrils as I plunged the hook I found earlier into the murky water of the bathtub, until it closed around the cold, hard shape of a key at the bottom.");
+                                                    args[0].possessions.dropItem("hook");
+                                                }
+                                            }
+                                        );
+                                    } else {
+                                        items.push(
+                                            {
+                                                text: target.possessions.items[i].fullName,
+                                                action: function(args) {
+                                                    args[2].paused = false;
+                                                }
+                                            }
+                                        );
+                                    }
+                                }
+                                items.push(
+                                    {
+                                        text: "Nothing",
+                                        action: function(args) {
+                                            args[2].paused = false;
+                                        }
+                                    }
+                                );
+                                choices.push(
+                                    {
+                                        text: "Use item",
+                                        action: function(args) {
+                                            ui.playerChoice("Which item to use?", items, args);
+                                        }
+                                    }
+                                );
+                            }
+                            ui.playerChoice("Stick your hand in the bathtub?", choices, [target, environment, game, ui]);
                         }
                     }
                 ],
@@ -212,14 +298,18 @@ export function initEnvironments() {
                         startAtY: 49,
                         zIndex: 2
                     }
-                ]
+                ],
+                {
+                    name: "./audio/rain_inside.mp3",
+                    volume: 0.2
+                }
             )
         }
     );
 }
 class Environment {
     //handles level data, backgrounds, objects, etc
-    constructor(background, size, playarea, position, objects, autotriggers, toggletriggers, entities) {
+    constructor(background, size, playarea, position, objects, autotriggers, toggletriggers, entities, ambient_audio) {
         this.element = document.createElement("div");
         this.element.style.width = `${size.w}px`;
         this.element.style.height = `${size.h}px`;
@@ -241,6 +331,9 @@ class Environment {
         this.toggletriggers = toggletriggers;
         //this.visualiseTriggers(this.toggletriggers);
         this.entities = entities;
+        this.ambient_audio = new Audio(ambient_audio.name);
+        this.ambient_audio.volume = ambient_audio.volume;
+        this.ambient_audio.loop = true;
     }
     setUpObjects() {
         for (var i = 0; i < this.objects.length; i++) {
@@ -296,10 +389,13 @@ class Environment {
         playarea.appendChild(this.element);
         this.setUpObjects();
         this.loadObjects();
+        this.ambient_audio.play();
     }
     unload() {
         this.element.remove();
         this.removeObjects();
+        this.ambient_audio.pause();
+        this.ambient_audio.currentTime = 0;
     }
     loadAt(player, position) {
         //move player to starting position

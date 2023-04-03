@@ -5,7 +5,7 @@ import { sleep } from "./modules/basics.js";
 import { GameInterface, tickContextText } from "./modules/UI.js";
 import { Entity } from "./modules/entity.js";
 import { Player } from "./modules/player.js";
-import { initEnvironments, environments } from "./modules/environment.js";
+import { initEnvironments, environments, scenes } from "./modules/environment.js";
 
 const size = {
     width: 320,
@@ -33,6 +33,7 @@ var mouse_down = false;
 window.onload = function() {
     updateScale();
     game = new Game();
+    window.game = game;//for debug purposes, delete later?
     //adds controls handle
     window.onmousemove = function(e) {
         mouseX = (size.width * (e.clientX - rect.x)) / rect.width;
@@ -48,7 +49,8 @@ window.onload = function() {
         game.mousestate(mouse_down);
     }
     initEnvironments();
-    game.play();
+    game.ui.displayStartingScreen(game);
+    //game.play();
 }
 
 /*
@@ -81,7 +83,9 @@ document.addEventListener('keydown', (event) => {
         }
         break;
     case "Tab":
-        console.log("tab press");
+        if(game) {
+            game.showPlayerInventory();
+        }
         event.preventDefault();
         event.stopPropagation();
         break;
@@ -123,6 +127,7 @@ class Game {
         this.ui = new GameInterface();
         //this.stages = new StageCollection();
         this.paused = true;
+        this.inInventory = false;
     }
     mousemove(mouseX, mouseY) {
         this.mouseX = mouseX;
@@ -146,8 +151,21 @@ class Game {
             this.paused = this.ui.interact();
         }
     }
+    showPlayerInventory() {
+        if (!this.paused && !this.inInventory) {
+            this.paused = true;
+            this.inInventory = true;
+            this.ui.displayInventory(this.player);
+        } else {
+            this.paused = false;
+            this.inInventory = false;
+            this.ui.hideInventory();
+        }
+    }
     async play() {
         this.paused = false;
+        //this.ui.displayScene(scenes[0], this);
+        this.player.possessions.journal.push("As I opened my eyes, I felt the pounding in my head and the soreness in my limbs. I looked around and realized I was in an unfamiliar bedroom, with no memory of how I got there. The room was dimly lit, with heavy curtains covering the windows. Everything felt surreal and hazy, like a dream. Panic set in as I struggled to remember who I was and how I ended up in this strange place.");
         environments[0].env.loadAt(this.player, environments[0].env.playerPosition);
         while(true) {//update condition later
             let sleeper = sleep(gametick);
