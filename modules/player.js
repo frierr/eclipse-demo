@@ -91,7 +91,7 @@ export class Player {
     setSpriteZIndex() {
         this.sprite.element.style.zIndex = Math.floor(this.position.y);
     }
-    move(keys_pressed) {
+    move(keys_pressed, sound) {
         if (this.positionChanged(keys_pressed)) {
             //do move animation
             this.current_animation_timing++;
@@ -102,6 +102,9 @@ export class Player {
                     this.sprite.frame = 0;
                 }
                 this.sprite.doAnimFrame();
+                if (this.sprite.frame % 2 == 0) {
+                    sound.playerSoundStep();
+                }
             }
             this.sprite.updateSpritePosition(this.position);
         } else {

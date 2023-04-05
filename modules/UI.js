@@ -109,7 +109,7 @@ export class GameInterface {
         menu_credits.className = "choice-a";
         menu_credits.textContent = "CREDITS";
         menu_credits.onclick = function() {
-            iface.appendChild(ui.makeScreenText("Rain SFX by JuliusH<br>Player Sprite by Maranza", "BACK", undefined));
+            iface.appendChild(ui.makeScreenText("Rain Ambient by JuliusH<br><br>SFX by Darkworld Audio<br><br>Player Sprite by Maranza", "BACK", undefined));
         };
         menu.appendChild(menu_credits);
         const menu_spacer = document.createElement("div");

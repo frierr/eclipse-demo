@@ -31,7 +31,7 @@ export const scenes = [
     }
 ];
 export var environments = [];
-export function initEnvironments() {
+export function initEnvironments(audio) {
     environments.push(
         {
             name: "house_master_bedroom",
@@ -71,6 +71,7 @@ export function initEnvironments() {
                         box: {h: 10, w: 34},
                         action: function(target, environment) {
                             if(!target.possessions.hasItem("hook")){
+                                environment.ambient.handler.playSFX("./audio/sfx/ClothesSyntheticfabric2.ogg");
                                 target.possessions.items.push({
                                     name: "hook",
                                     fullName: "Rusty fishing hook",
@@ -98,6 +99,7 @@ export function initEnvironments() {
                         at: {x: 15, y: 60},
                         box: {h: 10, w: 16},
                         action: function(target, environment) {
+                            environment.ambient.handler.playDoorOpen();
                             environment.unload();
                             environments[1].env.loadAt(target, environments[1].env.playerPosition);
                         }
@@ -108,18 +110,22 @@ export function initEnvironments() {
                         box: {h: 20, w: 10},
                         action: function(target, environment) {
                             if(target.possessions.hasKey("bedroom_key")) {
+                                environment.ambient.handler.playSFX("./audio/sfx/GateWoodChain1.ogg");
                                 target.displayText("Unlocked", 90, {x: 212, y: 90});
                                 target.possessions.journal.push("With a sense of relief flooding through me, I inserted the key into the lock and slowly turned it, feeling a rush of excitement and fear as I finally opened the door to the room I had been trapped in for what felt like an eternity.");
                                 this.action = function(target, environment) {
+                                    environment.ambient.handler.playDoorOpen();
                                     environment.unload();
-                                    environments[1].env.loadAt(target, environments[1].env.playerPosition);
+                                    environments[2].env.loadAt(target, {x:129, y:85});
                                     target.possessions.journal.push("With a trembling hand, I pushed open the door and took a deep breath, steeling myself for whatever lay beyond as I stepped into the unknown.");
                                     this.action = function(target, environment) {
+                                        environment.ambient.handler.playDoorOpen();
                                         environment.unload();
-                                        environments[1].env.loadAt(target, environments[1].env.playerPosition);
+                                        environments[2].env.loadAt(target, {x:129, y:85});
                                     };
                                 };
                             } else  {
+                                environment.ambient.handler.playDoorClose();
                                 target.displayText("The door is locked...", 90, {x: 212, y: 90});
                             }
                         }
@@ -129,6 +135,7 @@ export function initEnvironments() {
                         at: {x: 20, y: 112},
                         box: {h: 10, w: 10},
                         action: function(target, environment, ui) {
+                            environment.ambient.handler.playSFX("./audio/sfx/PaperDocument1.ogg");
                             for (var i = 0; i < environment.objects.length; i++) {
                                 if (environment.objects[i].name == "drawer") {
                                     environment.objects[i].image = "./levels/objects/drawer.png";
@@ -154,8 +161,9 @@ export function initEnvironments() {
                 ],
                 [],
                 {
-                    name: "./audio/rain_inside.mp3",
-                    volume: 0.3
+                    handler: audio,
+                    ambient: "./audio/ambient/rain_loop.mp3",
+                    volume: 0.4
                 }
             )
         }
@@ -200,6 +208,7 @@ export function initEnvironments() {
                         at: {x: 85, y: 65},
                         box: {h: 10, w: 10},
                         action: function(target, environment) {
+                            environment.ambient.handler.playDoorOpen();
                             environment.unload();
                             environments[0].env.loadAt(target, {x:105, y:90});
                         }
@@ -252,7 +261,8 @@ export function initEnvironments() {
                                                             img: undefined
                                                         }
                                                     );
-                                                    args[3].displayScene(scenes[0], args[2]);
+                                                    //args[3].displayScene(scenes[0], args[2]);
+                                                    args[2].paused = false;
                                                     args[0].possessions.journal.push("The metallic scent of blood filled my nostrils as I plunged the hook I found earlier into the murky water of the bathtub, until it closed around the cold, hard shape of a key at the bottom.");
                                                     args[0].possessions.dropItem("hook");
                                                 }
@@ -300,8 +310,355 @@ export function initEnvironments() {
                     }
                 ],
                 {
-                    name: "./audio/rain_inside.mp3",
+                    handler: audio,
+                    ambient: "./audio/ambient/rain_loop.mp3",
                     volume: 0.2
+                }
+            )
+        }
+    );
+    environments.push(
+        {
+            name: "house_second_floor",
+            env: new Environment(
+                "./levels/house_second_floor.png", 
+                {w:180,h:123}, 
+                {x:0, y:49, w:177, h:74}, 
+                {x:128,y:87},
+                [
+                    //objects
+                ],
+                [
+                    {
+                        name: "stairs",
+                        at: {x: 140, y: 123},
+                        box: {h: 10, w: 22},
+                        action: function(target, environment) {
+                            environment.unload();
+                            environments[6].env.loadAt(target, {x:189, y:129});
+                        }
+                    }
+                ],
+                [
+                    {
+                        name: "door_mb",
+                        at: {x: 50, y: 59},
+                        box: {h: 10, w: 16},
+                        action: function(target, environment) {
+                            environment.ambient.handler.playDoorOpen();
+                            environment.unload();
+                            environments[0].env.loadAt(target, {x:231, y:133});
+                        }
+                    },
+                    {
+                        name: "door_balcony",
+                        at: {x: 8, y: 59},
+                        box: {h: 10, w: 16},
+                        action: function(target, environment) {
+                            environment.ambient.handler.playDoorOpen();
+                            environment.unload();
+                            environments[3].env.loadAt(target, environments[3].env.playerPosition);
+                        }
+                    },
+                    {
+                        name: "door_kids",
+                        at: {x: 142, y: 59},
+                        box: {h: 10, w: 16},
+                        action: function(target, environment) {
+                            environment.ambient.handler.playDoorOpen();
+                            environment.unload();
+                            environments[4].env.loadAt(target, environments[4].env.playerPosition);
+                        }
+                    },
+                    {
+                        name: "door_bathroom",
+                        at: {x: 170, y: 68},
+                        box: {h: 16, w: 10},
+                        action: function(target, environment) {
+                            environment.ambient.handler.playDoorOpen();
+                            environment.unload();
+                            environments[5].env.loadAt(target, environments[5].env.playerPosition);
+                        }
+                    }
+                ],
+                [
+                    //entities
+                ],
+                {
+                    handler: audio,
+                    ambient: "./audio/ambient/rain_loop.mp3",
+                    volume: 0.2
+                }
+            )
+        }
+    );
+    environments.push(
+        {
+            name: "house_balcony",
+            env: new Environment(
+                "./levels/house_balcony.png", 
+                {w:103,h:71}, 
+                {x:0, y:49, w:100, h:22}, 
+                {x:200,y:121},
+                [
+                    //objects
+                ],
+                [],
+                [
+                    {
+                        name: "door_sf",
+                        at: {x: 95, y: 68},
+                        box: {h: 16, w: 10},
+                        action: function(target, environment) {
+                            environment.ambient.handler.playDoorOpen();
+                            environment.unload();
+                            environments[2].env.loadAt(target, {x: 88, y:85});
+                        }
+                    }
+                ],
+                [
+                    //entities
+                ],
+                {
+                    handler: audio,
+                    ambient: "./audio/ambient/rain_loop.mp3",
+                    volume: 0.8
+                }
+            )
+        }
+    );
+    environments.push(
+        {
+            name: "house_kids_bedroom",
+            env: new Environment(
+                "./levels/house_kids_bedroom.png", 
+                {w:175,h:121}, 
+                {x:0, y:49, w:175, h:68}, 
+                {x:99,y:146},
+                [
+                    //objects
+                ],
+                [],
+                [
+                    {
+                        name: "door_sf",
+                        at: {x: 18, y: 117},
+                        box: {h: 10, w: 16},
+                        action: function(target, environment) {
+                            environment.ambient.handler.playDoorOpen();
+                            environment.unload();
+                            environments[2].env.loadAt(target, {x:218, y:86});
+                        }
+                    }
+                ],
+                [
+                    //entities
+                ],
+                {
+                    handler: audio,
+                    ambient: "./audio/ambient/rain_loop.mp3",
+                    volume: 0.4
+                }
+            )
+        }
+    );
+    environments.push(
+        {
+            name: "house_general_bathroom",
+            env: new Environment(
+                "./levels/house_general_bathroom.png", 
+                {w:100,h:95}, 
+                {x:0, y:49, w:100, h:42}, 
+                {x:125,y:133},
+                [
+                    //objects
+                ],
+                [],
+                [
+                    {
+                        name: "door_sf",
+                        at: {x: 6, y: 91},
+                        box: {h: 10, w: 16},
+                        action: function(target, environment) {
+                            environment.ambient.handler.playDoorOpen();
+                            environment.unload();
+                            environments[2].env.loadAt(target, {x:238, y:95});
+                        }
+                    }
+                ],
+                [
+                    //entities
+                ],
+                {
+                    handler: audio,
+                    ambient: "./audio/ambient/rain_loop.mp3",
+                    volume: 0.2
+                }
+            )
+        }
+    );
+    environments.push(
+        {
+            name: "house_first_floor",
+            env: new Environment(
+                "./levels/house_first_floor.png", 
+                {w:87,h:167}, 
+                {x:4, y:49, w:81, h:115}, 
+                {x:189,y:130},
+                [
+                    //objects
+                ],
+                [
+                    {
+                        name: "stairs",
+                        at: {x: 60, y: 81},
+                        box: {h: 10, w: 22},
+                        action: function(target, environment) {
+                            environment.unload();
+                            environments[2].env.loadAt(target, {x:220, y:111});
+                        }
+                    }
+                ],
+                [
+                    //toggle triggers
+                ],
+                [
+                    //entities
+                ],
+                {
+                    handler: audio,
+                    ambient: "./audio/ambient/rain_loop.mp3",
+                    volume: 0.2
+                }
+            )
+        }
+    );
+    environments.push(
+        {
+            name: "house_save_room",
+            env: new Environment(
+                "./levels/house_save_room.png", 
+                {w:87,h:115}, 
+                {x:4, y:49, w:81, h:64}, 
+                {x:149,y:146},
+                [
+                    //objects
+                ],
+                [],
+                [
+                    //toggle triggers
+                ],
+                [
+                    //entities
+                ],
+                {
+                    handler: audio,
+                    ambient: "./audio/ambient/rain_loop.mp3",
+                    volume: 0.4
+                }
+            )
+        }
+    );
+    environments.push(
+        {
+            name: "house_kitchen",
+            env: new Environment(
+                "./levels/house_kitchen.png", 
+                {w:137,h:115}, 
+                {x:0, y:49, w:134, h:64}, 
+                {x:217,y:130},
+                [
+                    //objects
+                ],
+                [],
+                [
+                    //toggle triggers
+                ],
+                [
+                    //entities
+                ],
+                {
+                    handler: audio,
+                    ambient: "./audio/ambient/rain_loop.mp3",
+                    volume: 0.4
+                }
+            )
+        }
+    );
+    environments.push(
+        {
+            name: "house_dining",
+            env: new Environment(
+                "./levels/house_dining.png", 
+                {w:118,h:180}, 
+                {x:0, y:49, w:115, h:132}, 
+                {x:160,y:57},
+                [
+                    //objects
+                ],
+                [],
+                [
+                    //toggle triggers
+                ],
+                [
+                    //entities
+                ],
+                {
+                    handler: audio,
+                    ambient: "./audio/ambient/rain_loop.mp3",
+                    volume: 0.4
+                }
+            )
+        }
+    );
+    environments.push(
+        {
+            name: "house_office",
+            env: new Environment(
+                "./levels/house_office.png", 
+                {w:107,h:115}, 
+                {x:4, y:49, w:105, h:64}, 
+                {x:118,y:132},
+                [
+                    //objects
+                ],
+                [],
+                [
+                    //toggle triggers
+                ],
+                [
+                    //entities
+                ],
+                {
+                    handler: audio,
+                    ambient: "./audio/ambient/rain_loop.mp3",
+                    volume: 0.4
+                }
+            )
+        }
+    );
+    environments.push(
+        {
+            name: "house_living_room",
+            env: new Environment(
+                "./levels/house_living_room.png", 
+                {w:320,h:180}, 
+                {x:0, y:49, w:317, h:131}, 
+                {x:308,y:66},
+                [
+                    //objects
+                ],
+                [],
+                [
+                    //toggle triggers
+                ],
+                [
+                    //entities
+                ],
+                {
+                    handler: audio,
+                    ambient: "./audio/ambient/rain_loop.mp3",
+                    volume: 0.4
                 }
             )
         }
@@ -309,7 +666,7 @@ export function initEnvironments() {
 }
 class Environment {
     //handles level data, backgrounds, objects, etc
-    constructor(background, size, playarea, position, objects, autotriggers, toggletriggers, entities, ambient_audio) {
+    constructor(background, size, playarea, position, objects, autotriggers, toggletriggers, entities, ambient) {
         this.element = document.createElement("div");
         this.element.style.width = `${size.w}px`;
         this.element.style.height = `${size.h}px`;
@@ -328,12 +685,11 @@ class Environment {
         this.objects_elems = [];
         this.setUpObjects();
         this.autotriggers = autotriggers;
+        this.visualiseTriggers(this.autotriggers);
         this.toggletriggers = toggletriggers;
-        //this.visualiseTriggers(this.toggletriggers);
+        this.visualiseTriggers(this.toggletriggers);
         this.entities = entities;
-        this.ambient_audio = new Audio(ambient_audio.name);
-        this.ambient_audio.volume = ambient_audio.volume;
-        this.ambient_audio.loop = true;
+        this.ambient = ambient;
     }
     setUpObjects() {
         for (var i = 0; i < this.objects.length; i++) {
@@ -353,6 +709,9 @@ class Environment {
             this.objects_elems[i].remove();
         }
         this.objects_elems = [];
+        for (var i = 0; i < this.entities.length; i++) {
+            this.entities[i].sprite.updateSpritePosition({x: -100, y:-100});
+        }
     }
     loadObjects() {
         for (var i = 0; i < this.objects_elems.length; i++) {
@@ -376,12 +735,16 @@ class Environment {
     toggleTrigger(target, ui, game) {
         //determine if player is in any trigger area
         for (var i = 0; i < this.toggletriggers.length; i++) {
-            if (target.position.x - target.box.sides <= this.toggletriggers[i].at.x + this.toggletriggers[i].box.w + this.position.x && target.position.x + target.box.sides >= this.toggletriggers[i].at.x + this.position.x
-            && target.position.y - target.box.top <= this.toggletriggers[i].at.y + this.position.y && target.position.y >= this.toggletriggers[i].at.y - this.toggletriggers[i].box.h + this.position.y) {
-                if(this.toggletriggers[i].action(target, this, ui, game)) {
-                    return true;
-                }
-                return;
+            if (this.checkInTrigger(this.toggletriggers[i], target, ui, game)) {
+                return true;
+            }
+        }
+    }
+    checkInTrigger(trigger, target, ui, game) {
+        if (target.position.x - target.box.sides <= trigger.at.x + trigger.box.w + this.position.x && target.position.x + target.box.sides >= trigger.at.x + this.position.x
+        && target.position.y - target.box.top <= trigger.at.y + this.position.y && target.position.y >= trigger.at.y - trigger.box.h + this.position.y) {
+            if(trigger.action(target, this, ui, game)) {
+                return true;
             }
         }
     }
@@ -389,13 +752,11 @@ class Environment {
         playarea.appendChild(this.element);
         this.setUpObjects();
         this.loadObjects();
-        this.ambient_audio.play();
+        this.ambient.handler.playAmbient(this.ambient.ambient, this.ambient.volume);
     }
     unload() {
         this.element.remove();
         this.removeObjects();
-        this.ambient_audio.pause();
-        this.ambient_audio.currentTime = 0;
     }
     loadAt(player, position) {
         //move player to starting position

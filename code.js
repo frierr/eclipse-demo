@@ -6,6 +6,7 @@ import { GameInterface, tickContextText } from "./modules/UI.js";
 import { Entity } from "./modules/entity.js";
 import { Player } from "./modules/player.js";
 import { initEnvironments, environments, scenes } from "./modules/environment.js";
+import { AudioHandler } from "./modules/audio.js";
 
 const size = {
     width: 320,
@@ -48,7 +49,7 @@ window.onload = function() {
         mouse_down = false;
         game.mousestate(mouse_down);
     }
-    initEnvironments();
+    initEnvironments(game.sound);
     game.ui.displayStartingScreen(game);
     //game.play();
 }
@@ -125,6 +126,7 @@ class Game {
         this.mouseY = 0;
         this.player = new Player();
         this.ui = new GameInterface();
+        this.sound = new AudioHandler(0.5);
         //this.stages = new StageCollection();
         this.paused = true;
         this.inInventory = false;
@@ -171,8 +173,9 @@ class Game {
             let sleeper = sleep(gametick);
             if(!this.paused) {
                 this.handlePlayer();
+                this.handleTriggers();
                 this.handleEntities();
-                this.ui.tickUI();
+                //this.ui.tickUI();
                 tickContextText();
             }
             await sleeper;
@@ -180,7 +183,12 @@ class Game {
     }
     handlePlayer() {
         this.player.rotate(this.mouseX, this.mouseY);
-        this.player.move(keys_pressed);
+        this.player.move(keys_pressed, this.sound);
+    }
+    handleTriggers() {
+        for (var i = 0; i < this.player.inEnvironment.autotriggers.length; i++) {
+            this.player.inEnvironment.checkInTrigger(this.player.inEnvironment.autotriggers[i], this.player, this.ui, this);
+        }
     }
     handleEntities() {
         for (var i = 0; i < this.player.inEnvironment.entities.length; i++) {
