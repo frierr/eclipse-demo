@@ -168,7 +168,7 @@ class Game {
         this.paused = false;
         //this.ui.displayScene(scenes[0], this);
         this.player.possessions.journal.push("As I opened my eyes, I felt the pounding in my head and the soreness in my limbs. I looked around and realized I was in an unfamiliar bedroom, with no memory of how I got there. The room was dimly lit, with heavy curtains covering the windows. Everything felt surreal and hazy, like a dream. Panic set in as I struggled to remember who I was and how I ended up in this strange place.");
-        environments[0].env.loadAt(this.player, environments[0].env.playerPosition);
+        environments[2].env.loadAt(this.player, environments[2].env.playerPosition);
         while(true) {//update condition later
             let sleeper = sleep(gametick);
             if(!this.paused) {
@@ -196,6 +196,9 @@ class Game {
             switch(ent.type) {
                 case "reflection":
                     Entity.doReflection(ent, this.player, this.player.inEnvironment.position);
+                    break;
+                case "animated":
+                    Entity.doAnimation(ent);
                     break;
                 default:
                     break;

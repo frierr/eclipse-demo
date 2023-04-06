@@ -46,4 +46,26 @@ export class AudioHandler {
         this.sfx.load();
         this.sfx.play();
     }
+    stopMusic() {
+        this.music.pause();
+    }
+    playMusic(type, volume) {
+        this.music.volume = volume * this.general_volume;
+        switch(type) {
+            case "save":
+                this.music.src = "./audio/music/music-box.mp3";
+                break;
+            case "bg_0":
+                this.music.src = "./audio/music/Dark_Pulsating_Ambient.ogg";
+                break;
+            case "fight_0":
+                break;
+            case "boss":
+                break;
+            default:
+                break;
+        }
+        this.music.load();
+        this.music.play();
+    }
 }

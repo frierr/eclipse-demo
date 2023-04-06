@@ -115,6 +115,7 @@ export function initEnvironments(audio) {
                                 target.possessions.journal.push("With a sense of relief flooding through me, I inserted the key into the lock and slowly turned it, feeling a rush of excitement and fear as I finally opened the door to the room I had been trapped in for what felt like an eternity.");
                                 this.action = function(target, environment) {
                                     environment.ambient.handler.playDoorOpen();
+                                    environment.ambient.handler.playMusic("bg_0", 1);
                                     environment.unload();
                                     environments[2].env.loadAt(target, {x:129, y:85});
                                     target.possessions.journal.push("With a trembling hand, I pushed open the door and took a deep breath, steeling myself for whatever lay beyond as I stepped into the unknown.");
@@ -326,7 +327,44 @@ export function initEnvironments(audio) {
                 {x:0, y:49, w:177, h:74}, 
                 {x:128,y:87},
                 [
-                    //objects
+                    {
+                        name: "boundary",
+                        image: "",
+                        at: {x: 0, y: 123},
+                        size: {h: 0, w: 0},
+                        box: {h: 50, w: 142}
+                    },
+                    {
+                        name: "boundary",
+                        image: "",
+                        at: {x: 165, y: 123},
+                        size: {h: 0, w: 0},
+                        box: {h: 50, w: 20}
+                    },
+                    {
+                        name: "railing",
+                        image: "./levels/objects/second_floor_railing.png",
+                        at: {x: 81, y: 123},
+                        size: {h: 64, w: 61},
+                        box: {h: 0, w: 0},
+                        zIndex: 101
+                    },
+                    {
+                        name: "note",
+                        image: "./levels/objects/note_on_the_door.png",
+                        at: {x: 145, y: 35},
+                        size: {h: 11, w: 10},
+                        box: {h: 0, w: 0},
+                        zIndex: 50
+                    },
+                    {
+                        name: "door_bg_anim",
+                        image: "./levels/objects/balcony_door.gif",
+                        at: {x: 10, y: 38},
+                        size: {h: 20, w: 14},
+                        box: {h: 0, w: 0},
+                        zIndex: 0
+                    }
                 ],
                 [
                     {
@@ -364,10 +402,53 @@ export function initEnvironments(audio) {
                         name: "door_kids",
                         at: {x: 142, y: 59},
                         box: {h: 10, w: 16},
-                        action: function(target, environment) {
-                            environment.ambient.handler.playDoorOpen();
-                            environment.unload();
-                            environments[4].env.loadAt(target, environments[4].env.playerPosition);
+                        action: function(target, environment, ui, game) {
+                            environment.ambient.handler.playSFX("./audio/sfx/PaperDocument1.ogg");
+                            for (var i = 0; i < environment.objects.length; i++) {
+                                if (environment.objects[i].name == "note") {
+                                    environment.objects[i].image = "";
+                                    environment.removeObjects();
+                                    environment.setUpObjects();
+                                    environment.loadObjects();
+                                    break;
+                                }
+                            }
+                            target.possessions.notes.push({
+                                name: "door_note",
+                                fullName: "Note from the door",
+                                icon: undefined,
+                                text: undefined,
+                                img: "./misc/notes/door_note.png"
+                            });
+                            target.possessions.journal.push("[[add flavour text]]");
+                            ui.displayNote(target.possessions.notes[target.possessions.notes.length - 1]);
+                            this.action = function(target, environment, ui, game) {
+                                game.paused = true;
+                                const choices = [
+                                    {
+                                        text: "Yes",
+                                        action: function(args) {
+                                            args[1].ambient.handler.playDoorOpen();
+                                            args[1].unload();
+                                            environments[4].env.loadAt(target, environments[4].env.playerPosition);
+                                            args[1].toggletriggers[2].action = function(target, environment, ui, game) {
+                                                environment.ambient.handler.playDoorOpen();
+                                                environment.unload();
+                                                environments[4].env.loadAt(target, environments[4].env.playerPosition);
+                                            }
+                                            args[2].paused = false;
+                                        }
+                                    },
+                                    {
+                                        text: "No",
+                                        action: function(args) {
+                                            args[2].paused = false;
+                                        }
+                                    }
+                                ];
+                                ui.playerChoice("Might be dangerous. Enter anyway?", choices, [target, environment, game, ui]);
+                            };
+                            return true;
                         }
                     },
                     {
@@ -378,6 +459,14 @@ export function initEnvironments(audio) {
                             environment.ambient.handler.playDoorOpen();
                             environment.unload();
                             environments[5].env.loadAt(target, environments[5].env.playerPosition);
+                        }
+                    },
+                    {
+                        name: "paintings",
+                        at: {x: 85, y: 55},
+                        box: {h: 10, w: 40},
+                        action: function(target, environment) {
+                            target.displayText("Exquisite art...", 90, {x: 115, y: 40});
                         }
                     }
                 ],
@@ -396,12 +485,43 @@ export function initEnvironments(audio) {
         {
             name: "house_balcony",
             env: new Environment(
-                "./levels/house_balcony.png", 
+                "./levels/house_balcony.gif", 
                 {w:103,h:71}, 
-                {x:0, y:49, w:100, h:22}, 
+                {x:2, y:49, w:98, h:22}, 
                 {x:200,y:121},
                 [
-                    //objects
+                    {
+                        name: "wet_floor",
+                        image: "./levels/objects/balcony_floor.png",
+                        at: {x: 0, y: 71},
+                        size: {h: 22, w: 98},
+                        box: {h: 0, w: 0},
+                        zIndex: 0
+                    },
+                    {
+                        name: "rain",
+                        image: "./levels/objects/rain.gif",
+                        at: {x: 0, y: 71},
+                        size: {h: 71, w: 103},
+                        box: {h: 0, w: 0},
+                        zIndex: 999
+                    },
+                    {
+                        name: "blackwall_bugfix",
+                        image: "./levels/objects/blackwall.png",
+                        at: {x: -5, y: 121},
+                        size: {h: 50, w: 108},
+                        box: {h: 0, w: 0},
+                        zIndex: 3
+                    },
+                    {
+                        name: "railing",
+                        image: "./levels/objects/balcony_railing.png",
+                        at: {x: -5, y: 71},
+                        size: {h: 37, w: 103},
+                        box: {h: 0, w: 0},
+                        zIndex: 999
+                    }
                 ],
                 [],
                 [
@@ -417,7 +537,13 @@ export function initEnvironments(audio) {
                     }
                 ],
                 [
-                    //entities
+                    {
+                        type: "reflection",
+                        sprite: new Sprite("./entities/player_basic.png", {x:0, y:0}, {w:32, h:32}),
+                        reflectionTop: false,
+                        startAtY: 5,
+                        zIndex: 2
+                    }
                 ],
                 {
                     handler: audio,
@@ -506,7 +632,21 @@ export function initEnvironments(audio) {
                 {x:4, y:49, w:81, h:115}, 
                 {x:189,y:130},
                 [
-                    //objects
+                    {
+                        name: "boundary",
+                        image: "",
+                        at: {x: 60, y: 71},
+                        size: {h: 50, w: 50},
+                        box: {h: 50, w: 50}
+                    },
+                    {
+                        name: "boundary",
+                        image: "",
+                        at: {x: 60, y: 121},
+                        size: {h: 50, w: 1},
+                        box: {h: 50, w: 1},
+                        zIndex: 999
+                    }
                 ],
                 [
                     {
@@ -515,7 +655,7 @@ export function initEnvironments(audio) {
                         box: {h: 10, w: 22},
                         action: function(target, environment) {
                             environment.unload();
-                            environments[2].env.loadAt(target, {x:220, y:111});
+                            environments[2].env.loadAt(target, {x:222, y:111});
                         }
                     }
                 ],
