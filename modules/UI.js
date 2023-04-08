@@ -109,7 +109,7 @@ export class GameInterface {
         menu_credits.className = "choice-a";
         menu_credits.textContent = "CREDITS";
         menu_credits.onclick = function() {
-            iface.appendChild(ui.makeScreenText("Music by Sami Hiltunen, Oleg Kirilkov<br><br>Rain Ambient by JuliusH<br><br>SFX by Darkworld Audio<br><br>Player Sprite by Maranza", "BACK", undefined));
+            iface.appendChild(ui.makeScreenText("Music by Sami Hiltunen, Oleg Kirilkov<br><br>Rain Ambient by JuliusH<br><br>SFX by Darkworld Audio<br><br>Sprites by Maranza", "BACK", undefined));
         };
         menu.appendChild(menu_credits);
         const menu_spacer = document.createElement("div");
@@ -204,7 +204,36 @@ export class GameInterface {
                     const item = document.createElement("div");
                     if (v > 0 && v < 4 && w > 0 && w < 3) {
                         if(target.possessions.items[item_counter]) {
-                            item.textContent = target.possessions.items[item_counter].fullName;
+                            const item3 = document.createElement("div");
+                            if(target.possessions.items[item_counter].img) {
+                                item.style.backgroundImage = target.possessions.items[item_counter].img;
+                                item.style.backgroundSize = "cover";
+                            } else {
+                                item3.textContent = target.possessions.items[item_counter].fullName;
+                            }
+                            item.style.display = "grid";
+                            item.style.gridTemplateRows = "auto 20%";
+                            item.style.gap = "10px";
+                            item.appendChild(item3);
+                            if(target.possessions.items[item_counter].equippable) {
+                                //add option to equip
+                                const equip_item = target.possessions.items[item_counter];
+                                const item2 = document.createElement("div");
+                                item2.className = "choice-a";
+                                if(target.possessions.equipped == equip_item) {
+                                    item2.textContent = "unequip";
+                                } else {
+                                    item2.textContent = "equip";
+                                }
+                                item2.onclick = function() {
+                                    if(target.possessions.equip(equip_item)) {
+                                        this.textContent = "unequip";
+                                    } else {
+                                        this.textContent = "equip";
+                                    }
+                                }
+                                item.appendChild(item2);
+                            }
                         }
                         item_counter++;
                         item.style.border = "2px solid antiquewhite";

@@ -7,6 +7,7 @@ export class Player {
     //handles player
     constructor() {
         this.name = "Anna";
+        this.hp = 100;
         this.position = {
             x: 200,
             y: 110
@@ -36,6 +37,16 @@ export class Player {
                 return false;
             },
             items: [],
+            equipped: undefined,
+            equip: function(item) {
+                if (this.equipped == item) {
+                    this.equipped = undefined;
+                    return false;
+                } else {
+                    this.equipped = item;
+                    return true;
+                }
+            },
             hasItem: function(item) {
                 for (var i = 0; i < this.items.length; i++) {
                     if (this.items[i].name == item) {

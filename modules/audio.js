@@ -11,6 +11,7 @@ export class AudioHandler {
         this.ambient.loop = true;
         this.music = new Audio();
         this.music.loop = true;
+        this.music.type = "";
         this.sfx_player = new Audio();
         this.sfx = new Audio();
     }
@@ -48,24 +49,33 @@ export class AudioHandler {
     }
     stopMusic() {
         this.music.pause();
+        this.music.type = "";
     }
     playMusic(type, volume) {
         this.music.volume = volume * this.general_volume;
-        switch(type) {
-            case "save":
-                this.music.src = "./audio/music/music-box.mp3";
-                break;
-            case "bg_0":
-                this.music.src = "./audio/music/Dark_Pulsating_Ambient.ogg";
-                break;
-            case "fight_0":
-                break;
-            case "boss":
-                break;
-            default:
-                break;
+        if (this.music.type != type) {
+            this.music.type = type;
+            switch(type) {
+                case "menu":
+                    this.music.src = "./audio/music/Mellow_Ambient_Track.ogg";
+                    break;
+                case "save":
+                    this.music.src = "./audio/music/music-box.mp3";
+                    break;
+                case "bg_0":
+                    this.music.src = "./audio/music/Dark_Pulsating_Ambient.ogg";
+                    break;
+                case "fight_0":
+                    this.music.src = "./audio/music/Chaos_Loop.ogg";
+                    break;
+                case "boss":
+                    this.music.src = "./audio/music/Weird_Pedal_Noise_001.ogg";
+                    break;
+                default:
+                    break;
+            }
+            this.music.load();
+            this.music.play();
         }
-        this.music.load();
-        this.music.play();
     }
 }

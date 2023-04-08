@@ -51,6 +51,7 @@ window.onload = function() {
     }
     initEnvironments(game.sound);
     game.ui.displayStartingScreen(game);
+    game.sound.playMusic("menu", 1);
     //game.play();
 }
 
@@ -167,19 +168,24 @@ class Game {
     async play() {
         this.paused = false;
         //this.ui.displayScene(scenes[0], this);
+        this.sound.stopMusic();
         this.player.possessions.journal.push("As I opened my eyes, I felt the pounding in my head and the soreness in my limbs. I looked around and realized I was in an unfamiliar bedroom, with no memory of how I got there. The room was dimly lit, with heavy curtains covering the windows. Everything felt surreal and hazy, like a dream. Panic set in as I struggled to remember who I was and how I ended up in this strange place.");
-        environments[2].env.loadAt(this.player, environments[2].env.playerPosition);
-        while(true) {//update condition later
+        environments[0].env.loadAt(this.player, environments[0].env.playerPosition);
+        while(this.player.hp > 0) {
             let sleeper = sleep(gametick);
             if(!this.paused) {
                 this.handlePlayer();
                 this.handleTriggers();
                 this.handleEntities();
+                this.handleOverlays();
                 //this.ui.tickUI();
                 tickContextText();
             }
             await sleeper;
         }
+        this.player.position = {x: -1000, y: -1000};
+        this.player.sprite.updateSpritePosition(args[0].position);
+        this.ui.displayGameoverText("Too weak.", 0);
     }
     handlePlayer() {
         this.player.rotate(this.mouseX, this.mouseY);
@@ -192,17 +198,22 @@ class Game {
     }
     handleEntities() {
         for (var i = 0; i < this.player.inEnvironment.entities.length; i++) {
-            var ent = this.player.inEnvironment.entities[i];
+            const ent = this.player.inEnvironment.entities[i];
             switch(ent.type) {
                 case "reflection":
                     Entity.doReflection(ent, this.player, this.player.inEnvironment.position);
                     break;
-                case "animated":
-                    Entity.doAnimation(ent);
+                case "enemy":
+                    ent.enemy.doTick(this.player);
                     break;
                 default:
                     break;
             }
+        }
+    }
+    handleOverlays() {
+        if (this.player.inEnvironment.overlay) {
+            this.player.inEnvironment.updateOverlay(this.player);
         }
     }
 }
