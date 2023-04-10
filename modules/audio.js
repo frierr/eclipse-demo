@@ -1,7 +1,9 @@
 const sources = [
     "./audio/sfx/FootstepsStoneDirt4.ogg", //0 - player step
     "./audio/sfx/OldDoorOpen.ogg", //1 - door open
-    "./audio/sfx/OldDoorClose.ogg" //2 - door close
+    "./audio/sfx/OldDoorClose.ogg", //2 - door close
+    "./audio/sfx/hurt.ogg", //3 - player hurt
+    "./audio/sfx/DesignedPunch1.ogg" //4 - player attack
 ];
 
 export class AudioHandler {
@@ -18,6 +20,18 @@ export class AudioHandler {
     playerSoundStep() {
         this.sfx_player.volume = 0.2 * this.general_volume;
         this.sfx_player.setAttribute('src', sources[0]);
+        this.sfx_player.load();
+        this.sfx_player.play();
+    }
+    playerHurt() {
+        this.sfx_player.volume = 1 * this.general_volume;
+        this.sfx_player.setAttribute('src', sources[3]);
+        this.sfx_player.load();
+        this.sfx_player.play();
+    }
+    playerAttack() {
+        this.sfx_player.volume = 1 * this.general_volume;
+        this.sfx_player.setAttribute('src', sources[4]);
         this.sfx_player.load();
         this.sfx_player.play();
     }

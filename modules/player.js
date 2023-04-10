@@ -8,6 +8,7 @@ export class Player {
     constructor() {
         this.name = "Anna";
         this.hp = 100;
+        this.attack_cd = 0;
         this.position = {
             x: 200,
             y: 110
@@ -46,6 +47,11 @@ export class Player {
                     this.equipped = item;
                     return true;
                 }
+            },
+            heal: function(item, target) {
+                target.hp += item.heal;
+                target.hp = Math.min(100, target.hp);
+                this.dropItem(item.name);
             },
             hasItem: function(item) {
                 for (var i = 0; i < this.items.length; i++) {
@@ -123,8 +129,28 @@ export class Player {
             this.current_animation_timing = 0;
             this.sprite.doAnimFrame();
         }
+        if (this.attack_cd > 0) {
+            this.attack_cd--;
+        }
     }
     displayText(text, timeup, at) {
         displayContextTextAt(at, text, timeup);
+    }
+    receiveDamage(damage) {
+        this.inEnvironment.ambient.handler.playerHurt();
+        this.hp -= damage;
+    }
+    doAttack() {
+        if (this.attack_cd == 0 && this.possessions.equipped && this.possessions.equipped.name == "umbrella") {
+            this.inEnvironment.ambient.handler.playerAttack();
+            this.attack_cd = 60;
+            const envpos = this.inEnvironment.position;
+            const corrected_pos = {x: this.position.x - envpos.x - 16, y: this.position.y - envpos.y + 32};
+            for (var i = 0; i < this.inEnvironment.entities.length; i++) {
+                if (this.inEnvironment.entities[i].type == "enemy" && this.inEnvironment.entities[i].enemy.getDistanceToTarget(corrected_pos) < 20) {
+                    this.inEnvironment.entities[i].enemy.receiveDamage(20);
+                }
+            }
+        }
     }
 }

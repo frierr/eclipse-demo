@@ -34,7 +34,7 @@ var mouse_down = false;
 window.onload = function() {
     updateScale();
     game = new Game();
-    window.game = game;//for debug purposes, delete later?
+    window.game = game;
     //adds controls handle
     window.onmousemove = function(e) {
         mouseX = (size.width * (e.clientX - rect.x)) / rect.width;
@@ -128,7 +128,6 @@ class Game {
         this.player = new Player();
         this.ui = new GameInterface();
         this.sound = new AudioHandler(0.5);
-        //this.stages = new StageCollection();
         this.paused = true;
         this.inInventory = false;
     }
@@ -140,8 +139,8 @@ class Game {
         }
     }
     mousestate(mouse) {
-        //console.log(mouse);
-        if(!this.paused) {
+        if(!this.paused && mouse && this.player) {
+            this.player.doAttack();
         }
     }
     playerInteract() {
@@ -165,12 +164,21 @@ class Game {
             this.ui.hideInventory();
         }
     }
-    async play() {
+    async playLoaded() {
+        this.paused = false;
+        this.sound.playMusic("save", 1);
+        environments[7].env.loadAt(this.player, this.player.position);
+        this.tick();
+    }
+    play() {
         this.paused = false;
         //this.ui.displayScene(scenes[0], this);
         this.sound.stopMusic();
         this.player.possessions.journal.push("As I opened my eyes, I felt the pounding in my head and the soreness in my limbs. I looked around and realized I was in an unfamiliar bedroom, with no memory of how I got there. The room was dimly lit, with heavy curtains covering the windows. Everything felt surreal and hazy, like a dream. Panic set in as I struggled to remember who I was and how I ended up in this strange place.");
         environments[0].env.loadAt(this.player, environments[0].env.playerPosition);
+        this.tick();
+    }
+    async tick() {
         while(this.player.hp > 0) {
             let sleeper = sleep(gametick);
             if(!this.paused) {
@@ -184,7 +192,7 @@ class Game {
             await sleeper;
         }
         this.player.position = {x: -1000, y: -1000};
-        this.player.sprite.updateSpritePosition(args[0].position);
+        this.player.sprite.updateSpritePosition(this.player.position);
         this.ui.displayGameoverText("Too weak.", 0);
     }
     handlePlayer() {

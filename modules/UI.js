@@ -2,6 +2,8 @@ const iface = document.getElementById("interface");
 const gametick = 1000 / 60; //updates at 60 fps
 
 import { sleep } from "./basics.js";
+import { environments } from "./environment.js";
+import { loadEnvironmentData, loadPlayerData } from "./save.js";
 
 export class GameInterface {
     //displays menus and other ui
@@ -92,24 +94,47 @@ export class GameInterface {
         const menu_play = document.createElement("div");
         menu_play.className = "choice-a";
         menu_play.textContent = "PLAY";
+        const ui_temp = this;
         menu_play.onclick = function() {
             iface.innerHTML = "";
             iface.style.background = "none";
-            game.play();
+            const save = localStorage.getItem("gamesave");
+            if (save) {
+                //save data exists
+                const choices = [
+                    {
+                        text: "LOAD SAVED",
+                        action: function(args) {
+                            loadEnvironmentData(environments);
+                            loadPlayerData(args[2].player);
+                            args[2].playLoaded();
+                        }
+                    },
+                    {
+                        text: "START NEW",
+                        action: function(args) {
+                            args[2].play();
+                        }
+                    }
+                ];
+                ui_temp.playerChoice("", choices, [undefined, undefined, game, undefined]);
+            } else {
+                game.play();
+            }
         };
         menu.appendChild(menu_play);
         const menu_controls = document.createElement("div");
         menu_controls.className = "choice-a";
         menu_controls.textContent = "CONTROLS";
         menu_controls.onclick = function() {
-            iface.appendChild(ui.makeScreenText("WASD - move around<br>Mouse - look around<br>E - interact<br>TAB - open Inventory", "BACK", undefined));
+            iface.appendChild(ui.makeScreenText("WASD - move around<br>Mouse - look around<br>LMB - hit<br>E - interact<br>TAB - open Inventory", "BACK", undefined));
         };
         menu.appendChild(menu_controls);
         const menu_credits = document.createElement("div");
         menu_credits.className = "choice-a";
         menu_credits.textContent = "CREDITS";
         menu_credits.onclick = function() {
-            iface.appendChild(ui.makeScreenText("Music by Sami Hiltunen, Oleg Kirilkov<br><br>Rain Ambient by JuliusH<br><br>SFX by Darkworld Audio<br><br>Sprites by Maranza", "BACK", undefined));
+            iface.appendChild(ui.makeScreenText("Music by Sami Hiltunen, Oleg Kirilkov<br><br>Rain Ambient by JuliusH<br><br>SFX by Darkworld Audio, joseppujol<br><br>Sprites by Maranza", "BACK", undefined));
         };
         menu.appendChild(menu_credits);
         const menu_spacer = document.createElement("div");
@@ -120,6 +145,167 @@ export class GameInterface {
         menu_wrap.appendChild(menu_wrap_2);
         menu_wrap.appendChild(spacer_b);
         container.appendChild(menu_wrap);
+        iface.appendChild(container);
+    }
+    displayTerminalPuzzleScreen(game) {
+        const ui = this;
+        iface.style.background = "url(./misc/scene/terminal_screen.png)";
+        const container = document.createElement("div");
+        container.style.display = "grid";
+        container.style.gridTemplateRows = "12% 38% 30% 10% auto";
+        container.style.height = "100%";
+        container.style.width = "100%";
+        container.style.textAlign = "center";
+        const spacer_top = document.createElement("div");
+        container.appendChild(spacer_top);
+        const main = document.createElement("div");
+        main.style.display = "grid";
+        main.style.gridTemplateColumns = "25% 30% 10% 17% auto";
+        const main_spacer_0 = document.createElement("div");
+        main.appendChild(main_spacer_0);
+        const main_screen = document.createElement("div");
+        main_screen.style.display = "grid";
+        main_screen.style.gridTemplateRows = "auto 25% 15%";
+        /* SCREEN */
+        const screen_spacer = document.createElement("div");
+        main_screen.appendChild(screen_spacer);
+        const screen_text = document.createElement("div");
+        screen_text.style.color = "rgba(126,175,136,1)";
+        screen_text.style.textAlign = "center";
+        screen_text.textContent = "";
+        main_screen.appendChild(screen_text);
+        main.appendChild(main_screen);
+        const main_spacer_1 = document.createElement("div");
+        main.appendChild(main_spacer_1);
+        const inputpanel = document.createElement("div");
+        /* INPUT PANEL */
+        inputpanel.style.display = "grid";
+        inputpanel.style.gridTemplateRows = "1fr 1fr 1fr 1fr";
+        inputpanel.style.gap = "2px";
+        const inputline0 = document.createElement("div");
+        inputline0.style.display = "grid";
+        inputline0.style.gridTemplateColumns = "1fr 1fr 1fr";
+        inputline0.style.gap = "2px";
+        //
+        const i00 = document.createElement("div");
+        i00.classList = "choice-a";
+        i00.textContent = "7";
+        i00.onclick = function() {
+            terminalInput(screen_text, "7");
+        }
+        inputline0.appendChild(i00);
+        const i01 = document.createElement("div");
+        i01.classList = "choice-a";
+        i01.textContent = "8";
+        i01.onclick = function() {
+            terminalInput(screen_text, "8");
+        }
+        inputline0.appendChild(i01);
+        const i02 = document.createElement("div");
+        i02.classList = "choice-a";
+        i02.textContent = "9";
+        i02.onclick = function() {
+            terminalInput(screen_text, "9");
+        }
+        inputline0.appendChild(i02);
+        //
+        inputpanel.appendChild(inputline0);
+        const inputline1 = document.createElement("div");
+        inputline1.style.display = "grid";
+        inputline1.style.gridTemplateColumns = "1fr 1fr 1fr";
+        inputline1.style.gap = "2px";
+        //
+        const i10 = document.createElement("div");
+        i10.classList = "choice-a";
+        i10.textContent = "4";
+        i10.onclick = function() {
+            terminalInput(screen_text, "4");
+        }
+        inputline1.appendChild(i10);
+        const i11 = document.createElement("div");
+        i11.classList = "choice-a";
+        i11.textContent = "5";
+        i11.onclick = function() {
+            terminalInput(screen_text, "5");
+        }
+        inputline1.appendChild(i11);
+        const i12 = document.createElement("div");
+        i12.classList = "choice-a";
+        i12.textContent = "6";
+        i12.onclick = function() {
+            terminalInput(screen_text, "6");
+        }
+        inputline1.appendChild(i12);
+        //
+        inputpanel.appendChild(inputline1);
+        const inputline2 = document.createElement("div");
+        inputline2.style.display = "grid";
+        inputline2.style.gridTemplateColumns = "1fr 1fr 1fr";
+        inputline2.style.gap = "2px";
+        //
+        const i20 = document.createElement("div");
+        i20.classList = "choice-a";
+        i20.textContent = "1";
+        i20.onclick = function() {
+            terminalInput(screen_text, "1");
+        }
+        inputline2.appendChild(i20);
+        const i21 = document.createElement("div");
+        i21.classList = "choice-a";
+        i21.textContent = "2";
+        i21.onclick = function() {
+            terminalInput(screen_text, "2");
+        }
+        inputline2.appendChild(i21);
+        const i22 = document.createElement("div");
+        i22.classList = "choice-a";
+        i22.textContent = "3";
+        i22.onclick = function() {
+            terminalInput(screen_text, "3");
+        }
+        inputline2.appendChild(i22);
+        //
+        inputpanel.appendChild(inputline2);
+        const inputline3 = document.createElement("div");
+        inputline3.style.display = "grid";
+        inputline3.style.gridTemplateColumns = "1fr 2fr";
+        inputline3.style.gap = "2px";
+        //
+        const i30 = document.createElement("div");
+        i30.classList = "choice-a";
+        i30.textContent = "0";
+        i30.onclick = function() {
+            terminalInput(screen_text, "0");
+        }
+        inputline3.appendChild(i30);
+        const i31 = document.createElement("div");
+        i31.classList = "choice-a";
+        i31.textContent = "<";
+        i31.onclick = function() {
+            terminalRemove(screen_text);
+        }
+        inputline3.appendChild(i31);
+        //
+        inputpanel.appendChild(inputline3);
+        main.appendChild(inputpanel);
+        container.appendChild(main);
+        const spacer_mid = document.createElement("div");
+        container.appendChild(spacer_mid);
+        const backbuttonspace = document.createElement("div");
+        backbuttonspace.style.display = "grid";
+        backbuttonspace.style.gridTemplateColumns = "auto 30% auto";
+        const backbuttonspace_spacer = document.createElement("div");
+        backbuttonspace.appendChild(backbuttonspace_spacer);
+        const backbutton = document.createElement("div");
+        backbutton.classList = "choice-a";
+        backbutton.textContent = "BACK";
+        backbutton.onclick = function () {
+            iface.innerHTML = "";
+            iface.style.background = "none";
+            game.paused = false;
+        };
+        backbuttonspace.appendChild(backbutton);
+        container.appendChild(backbuttonspace);
         iface.appendChild(container);
     }
     playerChoice (text, options, args) {
@@ -198,50 +384,13 @@ export class GameInterface {
             container.style.width = "40%";
             container.style.margin = "auto";
             container.style.gap = "10px";
-            var item_counter = 0;
-            for(var v = 0; v < 5; v++) {
-                for(var w = 0; w < 4; w++) {
-                    const item = document.createElement("div");
-                    if (v > 0 && v < 4 && w > 0 && w < 3) {
-                        if(target.possessions.items[item_counter]) {
-                            const item3 = document.createElement("div");
-                            if(target.possessions.items[item_counter].img) {
-                                item.style.backgroundImage = target.possessions.items[item_counter].img;
-                                item.style.backgroundSize = "cover";
-                            } else {
-                                item3.textContent = target.possessions.items[item_counter].fullName;
-                            }
-                            item.style.display = "grid";
-                            item.style.gridTemplateRows = "auto 20%";
-                            item.style.gap = "10px";
-                            item.appendChild(item3);
-                            if(target.possessions.items[item_counter].equippable) {
-                                //add option to equip
-                                const equip_item = target.possessions.items[item_counter];
-                                const item2 = document.createElement("div");
-                                item2.className = "choice-a";
-                                if(target.possessions.equipped == equip_item) {
-                                    item2.textContent = "unequip";
-                                } else {
-                                    item2.textContent = "equip";
-                                }
-                                item2.onclick = function() {
-                                    if(target.possessions.equip(equip_item)) {
-                                        this.textContent = "unequip";
-                                    } else {
-                                        this.textContent = "equip";
-                                    }
-                                }
-                                item.appendChild(item2);
-                            }
-                        }
-                        item_counter++;
-                        item.style.border = "2px solid antiquewhite";
-                    }
-                    container.appendChild(item);
-                }
-            }
-            wrapper.appendChild(container);
+            const statusbar = document.createElement("div");
+            statusbar.style.position = "absolute";
+            statusbar.style.fontSize = "2em";
+            statusbar.style.top = "40px";
+            statusbar.style.left = "20px";
+            wrapper.appendChild(fillItemContainer(target, container, statusbar));
+            wrapper.appendChild(setStatusBar(statusbar, target));
         }
         category.appendChild(i);
         const n = document.createElement("div");
@@ -365,11 +514,6 @@ export class GameInterface {
             await sleeper;
         }
     }
-    tickUI() {
-        if(this.displayingScene) {
-            
-        }
-    }
     interact() {
         if(this.readingNote) {
             this.readingNote = false;
@@ -377,6 +521,107 @@ export class GameInterface {
             return this.inventory && this.inventory.parentNode;
         }
     }
+}
+
+function terminalRemove(screen_text) {
+    if (screen_text.textContent.length > 0 && screen_text.textContent != "CORRECT") {
+        screen_text.textContent = screen_text.textContent.substring(0, screen_text.textContent.length - 1);
+    }
+}
+
+function terminalInput(screen_text, value) {
+    if (screen_text.textContent.length < 3) {
+        screen_text.textContent += value;
+    }
+    if (screen_text.textContent.length == 3 && Number(screen_text.textContent) == 451) {
+        screen_text.textContent = "CORRECT";
+        game.player.inEnvironment.toggletriggers[0].action = function(target, environment, ui, game) {
+            environment.ambient.handler.playDoorOpen();
+            environment.ambient.handler.playMusic("bg_0", 1);
+            environment.unload();
+            environments[10].env.loadAt(target, {x: 140, y: 130});
+            //environments[10].env.loadAt(target, environments[10].env.playerPosition);
+        }
+        return true;
+    } else {
+        return false;
+    }
+}
+
+function fillItemContainer (target, container, statusbar) {
+    container.innerHTML = "";
+    var item_counter = 0;
+    for(var v = 0; v < 5; v++) {
+        for(var w = 0; w < 4; w++) {
+            const item = document.createElement("div");
+            if (v > 0 && v < 4 && w > 0 && w < 3) {
+                if(target.possessions.items[item_counter]) {
+                    const item3 = document.createElement("div");
+                    if(target.possessions.items[item_counter].img) {
+                        item.style.backgroundImage = `url(${target.possessions.items[item_counter].img})`;
+                        item.style.backgroundSize = "cover";
+                    } else {
+                        item3.textContent = target.possessions.items[item_counter].fullName;
+                    }
+                    item.style.display = "grid";
+                    item.style.gridTemplateRows = "auto 20%";
+                    item.style.gap = "10px";
+                    item.appendChild(item3);
+                    if(target.possessions.items[item_counter].equippable) {
+                        //add option to equip
+                        const equip_item = target.possessions.items[item_counter];
+                        const item2 = document.createElement("div");
+                        item2.className = "choice-a";
+                        if(target.possessions.equipped == equip_item) {
+                            item2.textContent = "unequip";
+                        } else {
+                            item2.textContent = "equip";
+                        }
+                        item2.onclick = function() {
+                            if(target.possessions.equip(equip_item)) {
+                                this.textContent = "unequip";
+                            } else {
+                                this.textContent = "equip";
+                            }
+                            container = fillItemContainer(target, container);
+                        }
+                        item.appendChild(item2);
+                    }
+                    if(target.possessions.items[item_counter].heal) {
+                        //add option to equip
+                        const equip_item = target.possessions.items[item_counter];
+                        const item2 = document.createElement("div");
+                        item2.className = "choice-a";
+                        item2.textContent = "use";
+                        item2.onclick = function() {
+                            target.possessions.heal(equip_item, target);
+                            container = fillItemContainer(target, container);
+                            statusbar = setStatusBar(statusbar, target);
+                        }
+                        item.appendChild(item2);
+                    }
+                }
+                item_counter++;
+                item.style.border = "2px solid antiquewhite";
+            }
+            container.appendChild(item);
+        }
+    }
+    return container;
+}
+
+function setStatusBar(statusbar, target) {
+    statusbar.innerHTML = "Condition: ";
+    if (target.hp > 80) {
+        statusbar.innerHTML += `<span style="color:lime">FINE</span>`;
+    } else if (target.hp > 40) {
+        statusbar.innerHTML += `<span style="color:gold">CAUTION</span>`;
+    } else if (target.hp > 20) {
+        statusbar.innerHTML += `<span style="color:red">HURT</span>`;
+    } else {
+        statusbar.innerHTML += `<span style="color:darkred">NEAR DEATH</span>`;
+    }
+    return statusbar;
 }
 
 const contexttext = document.getElementById("contexttext");

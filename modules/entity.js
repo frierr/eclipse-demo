@@ -1,4 +1,5 @@
 import { Sprite } from "./sprite.js";
+import { fastRoot } from "./basics.js";
 
 export class Entity {
     static doReflection(entity, target, env_pos) {
@@ -24,11 +25,23 @@ export class Entity {
 }
 
 const animtick = 15;
+const stun_affection = 120;
+const stun_duration = 180;
+const attack_readiness = 60;
 
 export class Enemy {
     //handles player
     constructor(at, active) {
         this.frozen = true;
+        this.stun = {
+            stunned: false,
+            affection: 0,
+            duration: 0
+        };
+        this.attack = {
+            readiness: 0,
+            damage: 20
+        };
         this.hp = 100;
         this.position = at;
         this.active = false;
@@ -87,14 +100,46 @@ export class Enemy {
     }
     doTick(target) {
         if(this.active && !this.frozen) {
-            const envpos = target.inEnvironment.position;
-            const corrected_pos = {x: target.position.x - envpos.x - 16, y: target.position.y - envpos.y + 32};
-            this.rotate(corrected_pos.x, corrected_pos.y);
-            this.move(corrected_pos);
-            if (this.getDistanceToTarget(corrected_pos) < 30) {
-                //&& equiped uv -> stun
-            } else if (this.getDistanceToTarget(corrected_pos) < 7) {
-                //do attack
+            if (this.stun.stunned) {
+                this.stun.duration++;
+                if (this.stun.duration > stun_duration) {
+                    this.stun.stunned = false;
+                    this.stun.duration = 0;
+                }
+            } else {
+                const envpos = target.inEnvironment.position;
+                const corrected_pos = {x: target.position.x - envpos.x - 16, y: target.position.y - envpos.y + 32};
+                this.rotate(corrected_pos.x, corrected_pos.y);
+                this.move(corrected_pos);
+                const dist = this.getDistanceToTarget(corrected_pos);
+                if (dist < 30 && target.possessions.equipped && target.possessions.equipped.name == "uv") {
+                    //&& equiped uv -> stun
+                    this.stun.affection++;
+                    if (this.stun.affection % 30 == 0) {
+                        this.sounds.src = "./audio/enemy/WoodSnap3.ogg";
+                        this.sounds.load();
+                        this.sounds.play();
+                    }
+                    if (this.stun.affection > stun_affection) {
+                        this.stun.stunned = true;
+                        this.stun.affection = 0;
+                        this.attack.readiness = 0;
+                    }
+                } else {
+                    this.stun.affection--;
+                    this.stun.affection = Math.max(0, this.stun.affection);
+                }
+                if (dist < 7) {
+                    //do attack
+                    this.attack.readiness++;
+                    if(this.attack.readiness > attack_readiness) {
+                        this.attack.readiness = 0;
+                        this.sounds.src = "./audio/enemy/anteater.ogg";
+                        this.sounds.load();
+                        this.sounds.play();
+                        target.receiveDamage(this.attack.damage);
+                    }
+                }
             }
         }
         this.sprite.element.style.zIndex = Math.floor(this.position.y);
@@ -128,41 +173,30 @@ export class Enemy {
         }
     }
     getDistanceToTarget(targetpos) {
-        //
+        const d0 = this.position.x - targetpos.x;
+        const d1 = this.position.y - targetpos.y;
+        const r2 = d0 * d0 + d1 * d1;
+        return fastRoot(r2, fastRoot(r2, Math.max(Math.abs(d0), Math.abs(d1))));
     }
-
-
-
-
-    //review and redo
-    
-    positionChanged(keys_pressed) {
-        const Xaxis = 0 + (keys_pressed.moveLeft ? -1 : 0) + (keys_pressed.moveRight ? 1 : 0);
-        const Yaxis = 0 + (keys_pressed.moveUp ? -1 : 0) + (keys_pressed.moveDown ? 1 : 0);
-        if (Xaxis != 0 || Yaxis != 0) {
-            //do movement
-            const prev_pos = {
-                x: this.position.x,
-                y: this.position.y
-            };
-            if (Xaxis != 0) {
-                if (Yaxis != 0) {
-                    this.position.x = this.position.x + Xaxis * this.speed_angled;
-                    this.position.y = this.position.y + Yaxis * this.speed_angled;
-                } else {
-                    this.position.x = this.position.x + Xaxis * this.speed;
+    receiveDamage(damage) {
+        if (this.active && !this.frozen && this.stun.stunned) {
+            this.sounds.src = "./audio/enemy/hurt.ogg";
+            this.sounds.load();
+            this.sounds.play();
+            this.hp -= damage;
+            if (this.hp <= 0) {
+                this.toggleActive(false);
+                this.sounds.src = "./audio/enemy/dead.ogg";
+                this.sounds.load();
+                this.sounds.play();
+                this.box = {
+                    sides: -10,
+                    top: -10
                 }
-            } else {
-                this.position.y = this.position.y + Yaxis * this.speed;
+                this.sprite.animation = 10;
+                this.sprite.frame = 1;
+                this.sprite.doAnimFrame();
             }
-            if (!this.inEnvironment.isInsidePlayarea(this)) {
-                this.position.x = prev_pos.x;
-                this.position.y = prev_pos.y;
-            }
-            this.setSpriteZIndex();
-            return true;
-        } else {
-            return false;
         }
     }
 }
