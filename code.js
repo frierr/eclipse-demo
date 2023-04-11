@@ -175,7 +175,7 @@ class Game {
         //this.ui.displayScene(scenes[0], this);
         this.sound.stopMusic();
         this.player.possessions.journal.push("As I opened my eyes, I felt the pounding in my head and the soreness in my limbs. I looked around and realized I was in an unfamiliar bedroom, with no memory of how I got there. The room was dimly lit, with heavy curtains covering the windows. Everything felt surreal and hazy, like a dream. Panic set in as I struggled to remember who I was and how I ended up in this strange place.");
-        environments[0].env.loadAt(this.player, environments[0].env.playerPosition);
+        environments[11].env.loadAt(this.player, environments[11].env.playerPosition);
         this.tick();
     }
     async tick() {

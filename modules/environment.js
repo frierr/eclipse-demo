@@ -1152,7 +1152,13 @@ export function initEnvironments(audio) {
                                 environment.ambient.handler.playDoorOpen();
                                 environment.ambient.handler.playMusic("save", 1);
                                 environment.unload();
-                                environments[7].env.loadAt(target, {x: 129, y: 130});
+                                environments[7].env.loadAt(target, {x: 150, y: 130});
+                            }
+                            environments[10].env.toggletriggers[0].action = function(target, environment, ui, game) {
+                                environment.ambient.handler.playDoorOpen();
+                                environment.ambient.handler.playMusic("save", 1);
+                                environment.unload();
+                                environments[7].env.loadAt(target, {x: 180, y: 130});
                             }
                             this.action = function(target, environment, ui, game) {
                                 //save game function
@@ -1264,7 +1270,7 @@ export function initEnvironments(audio) {
                             environment.ambient.handler.playDoorOpen();
                             environment.ambient.handler.playMusic("bg_0", 1);
                             environment.unload();
-                            environments[7].env.loadAt(target, {x: 129, y: 130});
+                            environments[7].env.loadAt(target, {x: 150, y: 130});
                         }
                     },
                     {
@@ -1369,30 +1375,122 @@ export function initEnvironments(audio) {
                 {x:0, y:49, w:115, h:132}, 
                 {x:160,y:57},
                 [
-                    //objects
-                ],
-                [],
-                [
                     {
-                        name: "door_kitchen",
-                        at: {x: 51, y: 59},
-                        box: {h: 10, w: 16},
-                        action: function(target, environment) {
-                            environment.ambient.handler.playDoorOpen();
-                            environment.unload();
-                            environments[8].env.loadAt(target, {x:159, y:144});
-                        }
+                        name: "switch",
+                        image: "./levels/objects/switch.png",
+                        at: {x: 35, y: 42},
+                        size: {h: 10, w: 7},
+                        box: {h: -10, w: -10},
+                        zIndex: 40
+                    },
+                    {
+                        name: "hint",
+                        image: "",
+                        at: {x: 17, y: 33},
+                        size: {h: 18, w: 12},
+                        box: {h: -10, w: -10},
+                        zIndex: 40
+                    },
+                    {
+                        name: "table",
+                        image: "./levels/objects/dining_table.png",
+                        at: {x: 40, y: 155},
+                        size: {h: 87, w: 34},
+                        box: {h: 70, w: 34},
+                        zIndex: 154
+                    },
+                    {
+                        name: "barricade",
+                        image: "./levels/objects/barricade.png",
+                        at: {x: 63, y: 135},
+                        size: {h: 34, w: 50},
+                        box: {h: 10, w: 50},
+                        zIndex: 125
+                    },
+                    {
+                        name: "chair0",
+                        image: "./levels/objects/chair_0.png",
+                        at: {x: 28, y: 105},
+                        size: {h: 28, w: 12},
+                        box: {h: 10, w: 12},
+                        zIndex: 95
+                    },
+                    {
+                        name: "chair1",
+                        image: "./levels/objects/chair_1.png",
+                        at: {x: 0, y: 140},
+                        size: {h: 13, w: 26},
+                        box: {h: 5, w: 10},
+                        zIndex: 135
                     }
                 ],
                 [
-                    //entities
+                    {
+                        name: "wake_enemy_0",
+                        at: {x: 75, y: 95},
+                        box: {h: 10, w: 40},
+                        action: function(target, environment, ui, game) {
+                            environment.entities[1].enemy.toggleActive(true);
+                            game.sound.playMusic("fight_0", 1);
+                            environment.autotriggers[0].action = function() {};
+                        }
+                    },
+                    {
+                        name: "wake_enemy_1",
+                        at: {x: 0, y: 140},
+                        box: {h: 10, w: 40},
+                        action: function(target, environment, ui, game) {
+                            environment.entities[2].enemy.toggleActive(true);
+                            game.sound.playMusic("fight_0", 1);
+                            environment.autotriggers[1].action = function() {};}
+                    }
+                ],
+                [
+                    {
+                        name: "door_kitchen",
+                        at: {x: 57, y: 59},
+                        box: {h: 10, w: 10},
+                        action: function(target, environment) {
+                            environment.ambient.handler.playDoorOpen();
+                            game.sound.playMusic("bg_0", 1);
+                            environment.unload();
+                            environments[8].env.loadAt(target, {x:159, y:144});
+                        }
+                    },
+                    {
+                        name: "switch",
+                        at: {x: 33, y: 59},
+                        box: {h: 10, w: 10},
+                        action: reusableFunctionsCollection.switch_0()
+                    },
+                    {
+                        name: "fusebox",
+                        at: {x: 93, y: 155},
+                        box: {h: 20, w: 20},
+                        action: reusableFunctionsCollection.fuse_d_0()
+                    }
+                ],
+                [
+                    {
+                        type: "lightsource",
+                        style: "uv",
+                        params: [[138, 38], 15]
+                    },
+                    {
+                        type: "enemy",
+                        enemy: new Enemy({x: 37, y: 120}, false, {x: 40, y: 30})
+                    },
+                    {
+                        type: "enemy",
+                        enemy: new Enemy({x: -70, y: 165}, false, {x: 75, y: 32})
+                    }
                 ],
                 {
                     handler: audio,
                     ambient: "./audio/ambient/rain_loop.mp3",
                     volume: 0.4
                 },
-                false
+                true
             )
         }
     );
@@ -1406,11 +1504,120 @@ export function initEnvironments(audio) {
                 {x:4, y:49, w:105, h:64}, 
                 {x:118,y:132},
                 [
-                    //objects
+                    {
+                        name: "rain",
+                        image: "./levels/objects/rain.gif",
+                        at: {x: 5, y: 50},
+                        size: {h: 50, w: 60},
+                        box: {h: 0, w: 0},
+                        zIndex: 0
+                    },
+                    {
+                        name: "bookshelf",
+                        image: "./levels/objects/bookshelf.png",
+                        at: {x: 70, y: 60},
+                        size: {h: 56, w: 36},
+                        box: {h: 10, w: 36},
+                        zIndex: 90
+                    },
+                    {
+                        name: "office_table",
+                        image: "./levels/objects/office_table.png",
+                        at: {x: 33, y: 90},
+                        size: {h: 36, w: 74},
+                        box: {h: 11, w: 74},
+                        zIndex: 124
+                    },
+                    {
+                        name: "pills",
+                        image: "./misc/items/pills.png",
+                        at: {x: 35, y: 68},
+                        size: {h: 8, w: 8},
+                        box: {h: -10, w: -10},
+                        zIndex: 125
+                    }
                 ],
                 [],
                 [
-                    //toggle triggers
+                    {
+                        name: "door_saveroom",
+                        at: {x: 2, y: 98},
+                        box: {h: 16, w: 10},
+                        action: function(target, environment) {
+                            environment.ambient.handler.playDoorOpen();
+                            environment.ambient.handler.playMusic("bg_0", 1);
+                            environment.unload();
+                            environments[7].env.loadAt(target, {x: 180, y: 130});
+                        }
+                    },
+                    {
+                        name: "door_livingroom",
+                        at: {x: 23, y: 115},
+                        box: {h: 10, w: 16},
+                        action: function(target, environment) {
+                            environment.ambient.handler.playDoorOpen();
+                            environment.ambient.handler.playMusic("bg_0", 1);
+                            environment.unload();
+                            environments[11].env.loadAt(target, {x: 308, y: 67});
+                        }
+                    },
+                    {
+                        name: "shelf",
+                        at: {x: 70, y: 70},
+                        box: {h: 10, w: 34},
+                        action: function(target, environment, ui, game) {
+                            target.displayText("Nothing useful for me...", 90, {x: 105, y: 58});
+                        }
+                    },
+                    {
+                        name: "desk",
+                        at: {x: 50, y: 80},
+                        box: {h: 10, w: 34},
+                        action: function(target, environment, ui, game) {
+                            target.displayText("Desk...", 90, {x: 155, y: 98});
+                        }
+                    },
+                    {
+                        name: "pills",
+                        at: {x: 28, y: 95},
+                        box: {h: 20, w: 20},
+                        action: function(target, environment, ui, game) {
+                            if(target.possessions.items.length < 6) {
+                                //add item to inventory
+                                target.possessions.items.push(
+                                    {
+                                        name: "pills",
+                                        fullName: "Pills",
+                                        text: "Restore your health",
+                                        quantity: 1,
+                                        img: "./misc/items/pills.png",
+                                        heal: 40
+                                    }
+                                );
+                                this.action = function() {};
+                                for (var i = 0; i < environment.objects.length; i++) {
+                                    if (environment.objects[i].name == "pills") {
+                                        environment.objects[i].image = "";
+                                        environment.removeObjects();
+                                        environment.setUpObjects();
+                                        environment.loadObjects();
+                                        break;
+                                    }
+                                }
+                            } else {
+                                game.paused = true;
+                                //no space
+                                ui.playerChoice("No space in inventory", [
+                                    {
+                                        text: "OK",
+                                        action: function(args) {
+                                            args[2].paused = false;
+                                        }
+                                    }
+                                ], [target, environment, game, ui]);
+                            }
+                        }
+                    }
                 ],
                 [
                     //entities
@@ -1428,12 +1635,43 @@ export function initEnvironments(audio) {
         {
             name: "house_living_room",
             env: new Environment(
-                "./levels/house_living_room.png", 
+                "./levels/house_living_room_alt.png", 
                 {w:320,h:180}, 
                 {x:0, y:49, w:317, h:131}, 
                 {x:308,y:66},
                 [
-                    //objects
+                    {
+                        name: "column",
+                        image: "./levels/objects/column.png",
+                        at: {x: 90, y: 85},
+                        size: {h: 58, w: 11},
+                        box: {h: 6, w: 11},
+                        zIndex: 80
+                    },
+                    {
+                        name: "column",
+                        image: "./levels/objects/column.png",
+                        at: {x: 90, y: 160},
+                        size: {h: 58, w: 11},
+                        box: {h: 6, w: 11},
+                        zIndex: 155
+                    },
+                    {
+                        name: "column",
+                        image: "./levels/objects/column.png",
+                        at: {x: 225, y: 85},
+                        size: {h: 58, w: 11},
+                        box: {h: 6, w: 11},
+                        zIndex: 80
+                    },
+                    {
+                        name: "column",
+                        image: "./levels/objects/column.png",
+                        at: {x: 225, y: 160},
+                        size: {h: 58, w: 11},
+                        box: {h: 6, w: 11},
+                        zIndex: 155
+                    }
                 ],
                 [],
                 [
@@ -1788,6 +2026,127 @@ const reusableFunctionsCollection = {
                 }
             ];
             ui.playerChoice("Insert fuse into the box?", choices, [target, environment, game, ui]);
+        }
+    },
+    fuse_d_0: function() {
+        return function(target, environment, ui, game) {
+            game.paused = true;
+            const choices = [
+                {
+                    text: "Yes",
+                    action: function(args) {
+                        if(args[0].possessions.hasItem("fuse")) {
+                            //add item to inventory
+                            args[0].possessions.dropItem("fuse");
+                            args[1].toggletriggers[2].action = reusableFunctionsCollection.fuse_d_1();
+                            //highlight switch
+                            args[1].objects[0].image = "./levels/objects/switch_powered.png";
+                            args[1].removeObjects();
+                            args[1].setUpObjects();
+                            args[1].loadObjects();
+                            //change switch function
+                            args[1].toggletriggers[1].action = reusableFunctionsCollection.switch_1();
+                            args[2].paused = false;
+                        } else {
+                            //no item
+                            ui.playerChoice("No fuse in inventory", [
+                                {
+                                    text: "OK",
+                                    action: function(args) {
+                                        args[2].paused = false;
+                                    }
+                                }
+                            ], [target, environment, game, ui]);
+                        }
+                    }
+                },
+                {
+                    text: "No",
+                    action: function(args) {
+                        args[2].paused = false;
+                    }
+                }
+            ];
+            ui.playerChoice("Insert fuse into the box?", choices, [target, environment, game, ui]);
+        }
+    },
+    fuse_d_1: function() {
+        return function(target, environment, ui, game) {
+            game.paused = true;
+            const choices = [
+                {
+                    text: "Yes",
+                    action: function(args) {
+                        if(args[0].possessions.items.length < 6) {
+                            //add item to inventory
+                            args[0].possessions.items.push(
+                                {
+                                    name: "fuse",
+                                    fullName: "Fuse",
+                                    text: "Protect against excessive current",
+                                    quantity: 1,
+                                    img: "./misc/items/fuse.png"
+                                }
+                            );
+                            args[1].toggletriggers[2].action = reusableFunctionsCollection.fuse_d_0();
+                            //change switch highlight
+                            args[1].objects[0].image = "./levels/objects/switch.png";
+                            //change switch function
+                            args[1].toggletriggers[1].action = reusableFunctionsCollection.switch_0();
+                            //remove hint if exist
+                            args[1].objects[1].image = "";
+                            args[1].removeObjects();
+                            args[1].setUpObjects();
+                            args[1].loadObjects();
+                            args[2].paused = false;
+                        } else {
+                            //no space
+                            ui.playerChoice("No space in inventory", [
+                                {
+                                    text: "OK",
+                                    action: function(args) {
+                                        args[2].paused = false;
+                                    }
+                                }
+                            ], [target, environment, game, ui]);
+                        }
+                    }
+                },
+                {
+                    text: "No",
+                    action: function(args) {
+                        args[2].paused = false;
+                    }
+                }
+            ];
+            ui.playerChoice("Remove fuse from the box?", choices, [target, environment, game, ui]);
+        }
+    },
+    switch_0: function() {
+        return function(target, environment, ui, game) {
+            game.sound.playSFX("./audio/sfx/SwitchButton3.ogg", 1);
+            game.paused = true;
+            ui.playerChoice("It's not powered", [
+                {
+                    text: "OK",
+                    action: function(args) {
+                        args[2].paused = false;
+                    }
+                }
+            ], [target, environment, game, ui]);
+        }
+    },
+    switch_1: function() {
+        return function(target, environment, ui, game) {
+            game.sound.playSFX("./audio/sfx/SwitchButton3.ogg", 1);
+            if (environment.objects[1].image == "") {
+                environment.objects[1].image = "./levels/objects/dining_hint.png";
+            } else {
+                environment.objects[1].image = "";
+            }
+            environment.removeObjects();
+            environment.setUpObjects();
+            environment.loadObjects();
         }
     },
     fuse_terminal_0: function() {

@@ -31,7 +31,7 @@ const attack_readiness = 60;
 
 export class Enemy {
     //handles player
-    constructor(at, active) {
+    constructor(at, active, correction) {
         this.frozen = true;
         this.stun = {
             stunned: false,
@@ -53,6 +53,7 @@ export class Enemy {
             sides: 4,
             top: 4
         }
+        this.correction = correction;
         this.speed = 0.8;
         this.speed_angled = this.speed / 1.41;
         this.sprite = new Sprite("./entities/enemy_basic.png", this.position, spriteSize);
@@ -108,7 +109,7 @@ export class Enemy {
                 }
             } else {
                 const envpos = target.inEnvironment.position;
-                const corrected_pos = {x: target.position.x - envpos.x - 16, y: target.position.y - envpos.y + 32};
+                const corrected_pos = {x: target.position.x - envpos.x - 16 - (this.correction ? this.correction.x : 0), y: target.position.y - envpos.y + 32 - (this.correction ? this.correction.y : 0)};
                 this.rotate(corrected_pos.x, corrected_pos.y);
                 this.move(corrected_pos);
                 const dist = this.getDistanceToTarget(corrected_pos);

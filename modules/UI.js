@@ -534,13 +534,13 @@ function terminalInput(screen_text, value) {
         screen_text.textContent += value;
     }
     if (screen_text.textContent.length == 3 && Number(screen_text.textContent) == 451) {
+        game.sound.playSFX("./audio/sfx/terminal.mp3");
         screen_text.textContent = "CORRECT";
         game.player.inEnvironment.toggletriggers[0].action = function(target, environment, ui, game) {
             environment.ambient.handler.playDoorOpen();
             environment.ambient.handler.playMusic("bg_0", 1);
             environment.unload();
             environments[10].env.loadAt(target, {x: 140, y: 130});
-            //environments[10].env.loadAt(target, environments[10].env.playerPosition);
         }
         return true;
     } else {
