@@ -85,7 +85,16 @@ export function initEnvironments(audio) {
                                     quantity: 1,
                                     img: "./misc/items/hook.png"
                                 });
-                                target.displayText("Found a fishing hook!", 90, {x: 160, y: 50});
+                                game.paused = true;
+                                //no space
+                                ui.playerChoice("Found a rusty fishing hook. Might be useful.", [
+                                    {
+                                        text: "OK",
+                                        action: function(args) {
+                                            args[2].paused = false;
+                                        }
+                                    }
+                                ], [target, environment, game, ui]);
                                 target.possessions.journal.push("As I rummaged through the wardrobe, my hand brushed against something cold and rusty, and I recoiled in horror as I pulled out a strange, bloodstained hook.");
                                 this.action = function(target, environment, ui, game) {
                                     target.displayText("Nothing useful anymore...", 90, {x: 160, y: 50});
@@ -238,16 +247,7 @@ export function initEnvironments(audio) {
                             game.paused = true;
                             const choices = [
                                 {
-                                    text: "Yes",
-                                    action: function(args) {
-                                        args[0].position = {x: -1000, y: -1000};
-                                        args[0].sprite.updateSpritePosition(args[0].position);
-                                        args[3].displayScene(scenes[0], args[2]);
-                                        args[3].displayGameoverText("Bad desicion.", 6);
-                                    }
-                                },
-                                {
-                                    text: "No",
+                                    text: "OK",
                                     action: function(args) {
                                         args[2].paused = false;
                                     }
@@ -270,7 +270,14 @@ export function initEnvironments(audio) {
                                                             img: undefined
                                                         }
                                                     );
-                                                    //args[3].displayScene(scenes[0], args[2]);
+                                                    ui.playerChoice("Obtained a key.", [
+                                                        {
+                                                            text: "OK",
+                                                            action: function(args) {
+                                                                args[2].paused = false;
+                                                            }
+                                                        }
+                                                    ], args);
                                                     args[2].paused = false;
                                                     args[0].possessions.journal.push("The metallic scent of blood filled my nostrils as I plunged the hook I found earlier into the murky water of the bathtub, until it closed around the cold, hard shape of a key at the bottom.");
                                                     args[0].possessions.dropItem("hook");
@@ -312,7 +319,7 @@ export function initEnvironments(audio) {
                                     }
                                 );
                             }
-                            ui.playerChoice("Stick your hand in the bathtub?", choices, [target, environment, game, ui]);
+                            ui.playerChoice("I'm not sticking my hand in that.", choices, [target, environment, game, ui]);
                         }
                     }
                 ],
@@ -722,6 +729,14 @@ export function initEnvironments(audio) {
                                             args[1].loadObjects();
                                             args[1].ambient.handler.playSFX("./audio/sfx/LargeGlassMirrorSmash2.ogg");
                                             args[2].paused = false;
+                                            ui.playerChoice("Obtained a light source", [
+                                                {
+                                                    text: "OK",
+                                                    action: function(args) {
+                                                        args[2].paused = false;
+                                                    }
+                                                }
+                                            ], args);
                                         } else {
                                             //no space
                                             ui.playerChoice("No space in inventory", [
@@ -996,6 +1011,14 @@ export function initEnvironments(audio) {
                                                     equippable: true
                                                 }
                                             );
+                                            ui.playerChoice("Obtained a weapon", [
+                                                {
+                                                    text: "OK",
+                                                    action: function(args) {
+                                                        args[2].paused = false;
+                                                    }
+                                                }
+                                            ], args);
                                             for (var i = 0; i < args[1].objects.length; i++) {
                                                 if (args[1].objects[i].name == "umbrella") {
                                                     args[1].objects[i].image = "./levels/objects/umbrella_stand_empty.png";
@@ -1006,7 +1029,6 @@ export function initEnvironments(audio) {
                                                 }
                                             }
                                             args[1].toggletriggers[4].action = function() {};
-                                            args[2].paused = false;
                                         } else {
                                             //no space
                                             ui.playerChoice("No space in inventory", [
@@ -1329,6 +1351,15 @@ export function initEnvironments(audio) {
                                         heal: 40
                                     }
                                 );
+                                game.paused = true;
+                                ui.playerChoice("Obtained a healing item", [
+                                    {
+                                        text: "OK",
+                                        action: function(args) {
+                                            args[2].paused = false;
+                                        }
+                                    }
+                                ], [target, environment, game, ui]);
                                 this.action = function() {};
                                 for (var i = 0; i < environment.objects.length; i++) {
                                     if (environment.objects[i].name == "pills") {
@@ -1591,9 +1622,18 @@ export function initEnvironments(audio) {
                                         text: "Restore your health",
                                         quantity: 1,
                                         img: "./misc/items/pills.png",
-                                        heal: 40
+                                        heal: 60
                                     }
                                 );
+                                game.paused = true;
+                                ui.playerChoice("Obtained a healing item", [
+                                    {
+                                        text: "OK",
+                                        action: function(args) {
+                                            args[2].paused = false;
+                                        }
+                                    }
+                                ], [target, environment, game, ui]);
                                 this.action = function() {};
                                 for (var i = 0; i < environment.objects.length; i++) {
                                     if (environment.objects[i].name == "pills") {
@@ -1675,14 +1715,71 @@ export function initEnvironments(audio) {
                 ],
                 [],
                 [
-                    //toggle triggers
+                    {
+                        name: "door_office",
+                        at: {x: 305, y: 69},
+                        box: {h: 16, w: 10},
+                        action: function(target, environment, ui, game) {
+                            game.paused = true;
+                            //no space
+                            ui.playerChoice("No going back now", [
+                                {
+                                    text: "OK",
+                                    action: function(args) {
+                                        args[2].paused = false;
+                                    }
+                                }
+                            ], [target, environment, game, ui]);
+                        }
+                    },
+                    {
+                        name: "door_foyer",
+                        at: {x: 30, y: 59},
+                        box: {h: 10, w: 16},
+                        action: function(target, environment, ui, game) {
+                            game.paused = true;
+                            //no space
+                            ui.playerChoice("Need a key to unlock", [
+                                {
+                                    text: "OK",
+                                    action: function(args) {
+                                        args[2].paused = false;
+                                    }
+                                }
+                            ], [target, environment, game, ui]);
+                        }
+                    },
+                    {
+                        name: "central",
+                        at: {x: 150, y: 125},
+                        box: {h: 20, w: 20},
+                        action: function(target, environment, ui, game) {
+                            game.paused = true;
+                            //no space
+                            ui.playerChoice("Take the key from the hand?", [
+                                {
+                                    text: "Yes",
+                                    action: function(args) {
+                                        console.log("start");
+                                        args[2].paused = false;
+                                    }
+                                },
+                                {
+                                    text: "No",
+                                    action: function(args) {
+                                        args[2].paused = false;
+                                    }
+                                }
+                            ], [target, environment, game, ui]);
+                        }
+                    }
                 ],
                 [
                     //entities
                 ],
                 {
                     handler: audio,
-                    ambient: "./audio/ambient/rain_loop.mp3",
+                    ambient: "./audio/music/Long_Distorted_Ambient.ogg",
                     volume: 0.4
                 }
             )

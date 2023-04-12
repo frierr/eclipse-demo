@@ -62,9 +62,12 @@ export class Player {
                 return false;
             },
             dropItem: function(item) {
+                var found = false;
                 const temp = [];
                 for (var i = 0; i < this.items.length; i++) {
-                    if (this.items[i].name != item) {
+                    if(this.items[i].name == item && !found) {
+                        found = true;
+                    } else {
                         temp.push(this.items[i]);
                     }
                 }

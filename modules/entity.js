@@ -26,8 +26,10 @@ export class Entity {
 
 const animtick = 15;
 const stun_affection = 120;
-const stun_duration = 180;
-const attack_readiness = 60;
+const stun_duration = 90;
+const attack_readiness = 30;
+const default_speed = 2 / 1.41;
+const stunned_speed = 1.2 / 1.41;
 
 export class Enemy {
     //handles player
@@ -54,8 +56,7 @@ export class Enemy {
             top: 4
         }
         this.correction = correction;
-        this.speed = 0.8;
-        this.speed_angled = this.speed / 1.41;
+        this.speed = default_speed;
         this.sprite = new Sprite("./entities/enemy_basic.png", this.position, spriteSize);
         this.current_animation_timing = 0;
         this.sounds = new Audio();
@@ -115,6 +116,7 @@ export class Enemy {
                 const dist = this.getDistanceToTarget(corrected_pos);
                 if (dist < 30 && target.possessions.equipped && target.possessions.equipped.name == "uv") {
                     //&& equiped uv -> stun
+                    this.speed = stunned_speed;
                     this.stun.affection++;
                     if (this.stun.affection % 30 == 0) {
                         this.sounds.src = "./audio/enemy/WoodSnap3.ogg";
@@ -127,6 +129,7 @@ export class Enemy {
                         this.attack.readiness = 0;
                     }
                 } else {
+                    this.speed = default_speed;
                     this.stun.affection--;
                     this.stun.affection = Math.max(0, this.stun.affection);
                 }
@@ -169,8 +172,8 @@ export class Enemy {
         if (sum != 0) {
             const Xaxis = (-1) * Xdiff / sum;
             const Yaxis = (-1) * Ydiff / sum;
-            this.position.x = this.position.x + Xaxis * this.speed_angled;
-            this.position.y = this.position.y + Yaxis * this.speed_angled;
+            this.position.x = this.position.x + Xaxis * this.speed;
+            this.position.y = this.position.y + Yaxis * this.speed;
         }
     }
     getDistanceToTarget(targetpos) {

@@ -16,6 +16,7 @@ export class GameInterface {
         this.scene = undefined;
         this.sceneGame = undefined;
         this.inventory = undefined;
+        this.inchoice = false;
         iface.style.backgroundPosition = "center";
         iface.style.backgroundRepeat = "no-repeat";
         iface.style.zIndex = 999;
@@ -309,6 +310,7 @@ export class GameInterface {
         iface.appendChild(container);
     }
     playerChoice (text, options, args) {
+        this.inchoice = true;
         const choice = document.createElement("div");
         choice.style.position = "absolute";
         choice.style.bottom = "0px";
@@ -326,8 +328,10 @@ export class GameInterface {
             answer.className = "choice-a";
             answer.textContent = options[i].text;
             const temp = i;
+            const ui = this;
             answer.addEventListener("click", (event) => {
                 options[temp].action(args);
+                ui.inchoice = false;
             });
             choice.appendChild(answer);
         }
@@ -520,6 +524,7 @@ export class GameInterface {
             this.note_wrap.remove();
             return this.inventory && this.inventory.parentNode;
         }
+        return this.inchoice;
     }
 }
 
