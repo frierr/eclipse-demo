@@ -66,6 +66,14 @@ export class GameInterface {
             window.location.reload();
         }));
     }
+    async displayGameEnd() {
+        iface.style.backgroundColor = "black";
+        var text = "<h2>THE END</h2><br>";
+        text += "Thank you for playing!<br><br>You've reached the end of the demo.<br>";
+        iface.appendChild(this.makeScreenText(text, "RETURN", function() {
+            window.location.reload();
+        }));
+    }
     displayStartingScreen(game) {
         const ui = this;
         iface.style.background = "url(./misc/title_screen.png)";
