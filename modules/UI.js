@@ -4,6 +4,7 @@ const gametick = 1000 / 60; //updates at 60 fps
 import { sleep } from "./basics.js";
 import { environments } from "./environment.js";
 import { loadEnvironmentData, loadPlayerData } from "./save.js";
+import { ui_strings, locale } from "./localisation.js";
 
 export class GameInterface {
     //displays menus and other ui
@@ -57,20 +58,20 @@ export class GameInterface {
         return container;
     }
     async displayGameoverText(reason, delay) {
-        var text = "<h2>DEAD</h2><br>";
+        var text = `<h2>${ui_strings.death.dead[locale]}</h2><br>`;
         text += reason;
         if (delay) {
             await sleep(delay * 1000);
         }
-        iface.appendChild(this.makeScreenText(text, "ACCEPT", function() {
+        iface.appendChild(this.makeScreenText(text, ui_strings.death.accept[locale], function() {
             window.location.reload();
         }));
     }
     async displayGameEnd() {
         iface.style.backgroundColor = "black";
-        var text = "<h2>THE END</h2><br>";
-        text += "Thank you for playing!<br><br>You've reached the end of the demo.<br>";
-        iface.appendChild(this.makeScreenText(text, "RETURN", function() {
+        var text = `<h2>${ui_strings.end.end[locale]}</h2><br>`;
+        text += ui_strings.end.message[locale];
+        iface.appendChild(this.makeScreenText(text, ui_strings.end.button[locale], function() {
             window.location.reload();
         }));
     }
@@ -102,7 +103,7 @@ export class GameInterface {
         menu.style.fontSize = "0.5em";
         const menu_play = document.createElement("div");
         menu_play.className = "choice-a";
-        menu_play.textContent = "PLAY";
+        menu_play.textContent = ui_strings.main_menu.play[locale];
         const ui_temp = this;
         menu_play.onclick = function() {
             iface.innerHTML = "";
@@ -112,7 +113,7 @@ export class GameInterface {
                 //save data exists
                 const choices = [
                     {
-                        text: "LOAD SAVED",
+                        text: ui_strings.main_menu.loadgame[locale],
                         action: function(args) {
                             loadEnvironmentData(environments);
                             loadPlayerData(args[2].player);
@@ -120,7 +121,7 @@ export class GameInterface {
                         }
                     },
                     {
-                        text: "START NEW",
+                        text: ui_strings.main_menu.newgame[locale],
                         action: function(args) {
                             args[2].play();
                         }
@@ -134,16 +135,16 @@ export class GameInterface {
         menu.appendChild(menu_play);
         const menu_controls = document.createElement("div");
         menu_controls.className = "choice-a";
-        menu_controls.textContent = "CONTROLS";
+        menu_controls.textContent = ui_strings.main_menu.controls[locale];
         menu_controls.onclick = function() {
-            iface.appendChild(ui.makeScreenText("WASD - move around<br>Mouse - look around<br>LMB - hit<br>E - interact<br>TAB - open Inventory", "BACK", undefined));
+            iface.appendChild(ui.makeScreenText(ui_strings.main_menu.controls_text[locale], ui_strings.main_menu.back[locale], undefined));
         };
         menu.appendChild(menu_controls);
         const menu_credits = document.createElement("div");
         menu_credits.className = "choice-a";
-        menu_credits.textContent = "CREDITS";
+        menu_credits.textContent = ui_strings.main_menu.credits[locale];
         menu_credits.onclick = function() {
-            iface.appendChild(ui.makeScreenText("Music by Sami Hiltunen, Oleg Kirilkov<br><br>Rain Ambient by JuliusH<br><br>SFX by Darkworld Audio, joseppujol<br><br>Sprites by Maranza", "BACK", undefined));
+            iface.appendChild(ui.makeScreenText(ui_strings.main_menu.credits_text[locale], ui_strings.main_menu.back[locale], undefined));
         };
         menu.appendChild(menu_credits);
         const menu_spacer = document.createElement("div");
@@ -307,7 +308,7 @@ export class GameInterface {
         backbuttonspace.appendChild(backbuttonspace_spacer);
         const backbutton = document.createElement("div");
         backbutton.classList = "choice-a";
-        backbutton.textContent = "BACK";
+        backbutton.textContent = ui_strings.main_menu.back[locale];
         backbutton.onclick = function () {
             iface.innerHTML = "";
             iface.style.background = "none";
@@ -370,7 +371,7 @@ export class GameInterface {
         const ui_temp = this;
         const j = document.createElement("div");
         j.className = "choice-a";
-        j.textContent = "Journal";
+        j.textContent = ui_strings.inventory.journal[locale];
         j.style.transform = "scale(0.5)";
         j.onclick = function() {
             wrapper.innerHTML = "";
@@ -384,7 +385,7 @@ export class GameInterface {
         category.appendChild(j);
         const i = document.createElement("div");
         i.className = "choice-a";
-        i.textContent = "Items";
+        i.textContent = ui_strings.inventory.items[locale];
         i.style.transform = "scale(0.5)";
         i.onclick = function() {
             wrapper.innerHTML = "";
@@ -407,12 +408,12 @@ export class GameInterface {
         category.appendChild(i);
         const n = document.createElement("div");
         n.className = "choice-a";
-        n.textContent = "Notes";
+        n.textContent = ui_strings.inventory.notes[locale];
         n.style.transform = "scale(0.5)";
         n.onclick = function() {
             wrapper.innerHTML = "";
             if(target.possessions.notes.length == 0) {
-                wrapper.textContent = "No notes";
+                wrapper.textContent = ui_strings.inventory.no_notes[locale];
             } else {
                 const container = document.createElement("div");
                 container.style.display = "grid";
@@ -442,12 +443,12 @@ export class GameInterface {
         category.appendChild(n);
         const k = document.createElement("div");
         k.className = "choice-a";
-        k.textContent = "Keys";
+        k.textContent = ui_strings.inventory.keys[locale];
         k.style.transform = "scale(0.5)";
         k.onclick = function() {
             wrapper.innerHTML = "";
             if(target.possessions.keys.length == 0) {
-                wrapper.textContent = "No keys";
+                wrapper.textContent = ui_strings.inventory.no_keys[locale];
             } else {
                 const container = document.createElement("div");
                 container.style.display = "grid";
@@ -586,15 +587,15 @@ function fillItemContainer (target, container, statusbar) {
                         const item2 = document.createElement("div");
                         item2.className = "choice-a";
                         if(target.possessions.equipped == equip_item) {
-                            item2.textContent = "unequip";
+                            item2.textContent = ui_strings.inventory.unequip[locale];
                         } else {
-                            item2.textContent = "equip";
+                            item2.textContent = ui_strings.inventory.equip[locale];
                         }
                         item2.onclick = function() {
                             if(target.possessions.equip(equip_item)) {
-                                this.textContent = "unequip";
+                                this.textContent = ui_strings.inventory.unequip[locale];
                             } else {
-                                this.textContent = "equip";
+                                this.textContent = ui_strings.inventory.equip[locale];
                             }
                             container = fillItemContainer(target, container);
                         }
@@ -605,7 +606,7 @@ function fillItemContainer (target, container, statusbar) {
                         const equip_item = target.possessions.items[item_counter];
                         const item2 = document.createElement("div");
                         item2.className = "choice-a";
-                        item2.textContent = "use";
+                        item2.textContent = ui_strings.inventory.use[locale];
                         item2.onclick = function() {
                             target.possessions.heal(equip_item, target);
                             container = fillItemContainer(target, container);
@@ -624,15 +625,15 @@ function fillItemContainer (target, container, statusbar) {
 }
 
 function setStatusBar(statusbar, target) {
-    statusbar.innerHTML = "Condition: ";
+    statusbar.innerHTML = `${ui_strings.condition.condition[locale]}: `;
     if (target.hp > 80) {
-        statusbar.innerHTML += `<span style="color:lime">FINE</span>`;
+        statusbar.innerHTML += `<span style="color:lime">${ui_strings.condition.fine[locale]}</span>`;
     } else if (target.hp > 40) {
-        statusbar.innerHTML += `<span style="color:gold">CAUTION</span>`;
+        statusbar.innerHTML += `<span style="color:gold">${ui_strings.condition.caution[locale]}</span>`;
     } else if (target.hp > 20) {
-        statusbar.innerHTML += `<span style="color:red">HURT</span>`;
+        statusbar.innerHTML += `<span style="color:red">${ui_strings.condition.hurt[locale]}</span>`;
     } else {
-        statusbar.innerHTML += `<span style="color:darkred">NEAR DEATH</span>`;
+        statusbar.innerHTML += `<span style="color:darkred">${ui_strings.condition.near[locale]}</span>`;
     }
     return statusbar;
 }

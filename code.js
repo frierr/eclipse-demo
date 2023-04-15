@@ -7,6 +7,7 @@ import { Entity } from "./modules/entity.js";
 import { Player } from "./modules/player.js";
 import { initEnvironments, environments, scenes } from "./modules/environment.js";
 import { AudioHandler } from "./modules/audio.js";
+import { journal_strings, locale, ui_strings } from "./modules/localisation.js";
 
 const size = {
     width: 320,
@@ -52,7 +53,6 @@ window.onload = function() {
     initEnvironments(game.sound);
     game.ui.displayStartingScreen(game);
     game.sound.playMusic("menu", 1);
-    //game.play();
 }
 
 /*
@@ -172,9 +172,8 @@ class Game {
     }
     play() {
         this.paused = false;
-        //this.ui.displayScene(scenes[0], this);
         this.sound.stopMusic();
-        this.player.possessions.journal.push("As I opened my eyes, I felt the pounding in my head and the soreness in my limbs. I looked around and realized I was in an unfamiliar bedroom, with no memory of how I got there. The room was dimly lit, with heavy curtains covering the windows. Everything felt surreal and hazy, like a dream. Panic set in as I struggled to remember who I was and how I ended up in this strange place.");
+        this.player.possessions.journal.push(journal_strings.waking_up[locale]);
         environments[0].env.loadAt(this.player, environments[0].env.playerPosition);
         this.tick();
     }
@@ -186,14 +185,13 @@ class Game {
                 this.handleTriggers();
                 this.handleEntities();
                 this.handleOverlays();
-                //this.ui.tickUI();
                 tickContextText();
             }
             await sleeper;
         }
         this.player.position = {x: -1000, y: -1000};
         this.player.sprite.updateSpritePosition(this.player.position);
-        this.ui.displayGameoverText("Too weak.", 0);
+        this.ui.displayGameoverText(ui_strings.death.general[locale], 0);
     }
     handlePlayer() {
         this.player.rotate(this.mouseX, this.mouseY);
