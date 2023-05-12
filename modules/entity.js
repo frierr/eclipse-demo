@@ -1,6 +1,6 @@
 import { Sprite } from "./sprite.js";
 import { fastRoot } from "./basics.js";
-import { afterFinalLoad } from "./environment.js";
+import { on_boss_death } from "./environments/house_living_room.js";
 
 export class Entity {
     static doReflection(entity, target, env_pos) {
@@ -523,7 +523,7 @@ export class Boss extends Enemy {
                         this.sprite.animation = 8;
                         this.sprite.frame = 3;
                         this.sprite.doAnimFrame();
-                        afterFinalLoad(target.inEnvironment);
+                        on_boss_death();
                     } else {
                         this.sprite.img.src = "./entities/boss_basic.png";
                         this.stage_data = this.#getTargetTruePosition({inEnvironment: {position: target.inEnvironment.position}, position: {x: 160, y: 110}});

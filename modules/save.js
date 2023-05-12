@@ -15,21 +15,46 @@ export function savePlayerData(player) {
 }
 
 export function saveEnvironments(environments) {
+    /*
+    WHAT TO SAVE:
+    object images, zIndex
+    trigger states
+    entity - lightsource - style
+    entity - enemy - active/dead
+    environment overlay
+    */
     const data_to_save = [];
-    var temp;
     for (var i = 0; i < environments.length; i++) {
-        const env = environments[i].env;
-        const data_inner = {
-            objects: env.objects,
-            autotriggers: JSON.stringify(env.autotriggers),
-            toggletriggers: JSON.stringify(env.toggletriggers),
-            entities: env.entities,
-            overlay: env.overlay
+        const env_data = {
+            object_data: [],
+            auto_trigger_data: [],
+            toggle_trigger_data: [],
+            entity_data: [],
+            overlay: environments[i].env.overlay
         }
-        data_to_save.push(data_inner);
-        if(env.toggletriggers.length > 0) {
-            temp = env.toggletriggers[0].action;
+        //object data
+        for (var j = 0; j < environments[i].env.objects.length; j++) {
+            env_data.object_data.push({image: environments[i].env.objects[j].image, zIndex: environments[i].env.objects[j].zIndex});
         }
+        //autotrigger states
+        for (var j = 0; j < environments[i].env.autotriggers.length; j++) {
+            env_data.auto_trigger_data.push(environments[i].env.autotriggers[j].state);
+        }
+        //toggletrigger states
+        for (var j = 0; j < environments[i].env.toggletriggers.length; j++) {
+            env_data.toggle_trigger_data.push(environments[i].env.toggletriggers[j].state);
+        }
+        //entity data
+        for (var j = 0; j < environments[i].env.entities.length; j++) {
+            if (environments[i].env.entities[j].type == "lightsource") {
+                env_data.entity_data.push({type: "lightsource", style: environments[i].env.entities[j].style});
+            } else if (environments[i].env.entities[j].type == "enemy") {
+                env_data.entity_data.push({type: "enemy", active: environments[i].env.entities[j].enemy.active, hp: environments[i].env.entities[j].enemy.hp});
+            } else {
+                env_data.entity_data.push({type: "other"});
+            }
+        }
+        data_to_save.push(env_data);
     }
     const serial = JSON.stringify(data_to_save);
     localStorage.setItem("envsave", serial);
@@ -51,35 +76,37 @@ export function loadPlayerData(player) {
 export function loadEnvironmentData(environments) {
     const loaded_data = JSON.parse(localStorage.getItem("envsave"));
     for (var i = 0; i < environments.length; i++) {
+        const env_data = loaded_data[i];
         const env = environments[i].env;
-        env.objects = loaded_data[i].objects;
-        env.overlay = loaded_data[i].overlay;
-        env.autotriggers = deserialiseTriggers(loaded_data[i].autotriggers);
-        env.toggletriggers = deserialiseTriggers(loaded_data[i].toggletriggers);
-        //env.entities = deserialiseEntities(loaded_data[i].entities);
+        env.overlay = env_data.overlay;
+        //load object data
+        for (var j = 0; j < env.objects.length; j++) {
+            env.objects[j].image = env_data.object_data[j].image;
+            env.objects[j].zIndex = env_data.object_data[j].zIndex;
+        }
+        //load autotriggers states
+        for (var j = 0; j < env.autotriggers.length; j++) {
+            env.autotriggers[j].state = env_data.auto_trigger_data[j];
+        }
+        //load toggletriggers states
+        for (var j = 0; j < env.toggletriggers.length; j++) {
+            env.toggletriggers[j].state = env_data.toggle_trigger_data[j];
+        }
+        //load entity data
+        for (var j = 0; j < env.entities.length; j++) {
+            if (env.entities[j].type == "lightsource") {
+                env.entities[j].style = env_data.entity_data[j].style;
+            } else if (env.entities[j].type == "enemy") {
+                env.entities[j].enemy.active = env_data.entity_data[j].active;
+                if(env_data.entity_data[j].hp <= 0) {
+                    env.entities[j].enemy.sprite.img.src = "";
+                } else {
+                    env.entities[j].enemy.hp = env_data.entity_data[j].hp;
+                }
+            }
+        }
+        //reload new data
+        env.removeObjects();
+        env.setUpObjects();
     }
-}
-
-function deserialiseEntities(loaded) {
-    const result = [];
-    /*loaded = JSON.parse(loaded);
-    for (var i = 0; i < loaded.length; i++) {
-        //parse enemy class?
-    }*/
-    return result;
-}
-
-function deserialiseTriggers(loaded) {
-    const result = [];
-    loaded = JSON.parse(loaded);
-    for (var i = 0; i < loaded.length; i++) {
-        const trigger = loaded[i];
-        eval("trigger.action = " + trigger.action);
-        result.push(trigger);
-    }
-    return result;
-}
-
-Function.prototype.toJSON = function() {
-    return this.toString();
 }
